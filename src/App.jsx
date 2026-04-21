@@ -6,7 +6,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 
-import AppLayout from '@/components/layout/AppLayout';
+import AppLayout from '@/components/layout/AppLayout.jsx';
 import Dashboard from '@/pages/Dashboard';
 import Transactions from '@/pages/Transactions';
 import Payments from '@/pages/Payments';
@@ -17,9 +17,18 @@ import Budget from '@/pages/Budget';
 import Reports from '@/pages/Reports';
 import AuditLog from '@/pages/AuditLog';
 import Settings from '@/pages/Settings';
+import Onboarding from '@/pages/Onboarding';
+import { useQuery } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, user } = useAuth();
+
+  const { data: clubs = [], isLoading: isLoadingClubs } = useQuery({
+    queryKey: ['clubs'],
+    queryFn: () => base44.entities.Club.list('-created_date', 1),
+    enabled: !isLoadingAuth && !isLoadingPublicSettings && !authError,
+  });
 
   if (isLoadingPublicSettings || isLoadingAuth) {
     return (
@@ -41,6 +50,23 @@ const AuthenticatedApp = () => {
       navigateToLogin();
       return null;
     }
+  }
+
+  if (isLoadingClubs) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-background">
+        <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  // No club yet → show onboarding
+  if (clubs.length === 0) {
+    return (
+      <Routes>
+        <Route path="*" element={<Onboarding />} />
+      </Routes>
+    );
   }
 
   return (

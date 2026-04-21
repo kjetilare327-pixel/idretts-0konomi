@@ -23,6 +23,10 @@
     "contact_phone": {
       "type": "string"
     },
+    "join_code": {
+      "type": "string",
+      "description": "6-digit code for members to join the club"
+    },
     "subscription_status": {
       "type": "string",
       "enum": [

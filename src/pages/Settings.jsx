@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Save, Building2, Mail, Trash2, AlertTriangle } from 'lucide-react';
+import { Save, Building2, Mail, Trash2, AlertTriangle, Hash } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -98,6 +98,24 @@ export default function Settings() {
           </Button>
         </form>
       </div>
+
+      <Separator />
+
+      {/* Join Code */}
+      {club?.join_code && (
+        <div className="bg-card rounded-xl border border-border p-6">
+          <div className="flex items-center gap-2 mb-3">
+            <Hash className="w-5 h-5 text-muted-foreground" />
+            <h3 className="text-base font-semibold">Invitasjonskode</h3>
+          </div>
+          <p className="text-sm text-muted-foreground mb-3">Del denne koden med nye medlemmer slik at de kan bli med i laget.</p>
+          <div className="flex items-center gap-3">
+            <div className="text-4xl font-mono font-bold tracking-widest text-primary bg-primary/10 px-6 py-3 rounded-xl select-all">
+              {club.join_code}
+            </div>
+          </div>
+        </div>
+      )}
 
       <Separator />
 
