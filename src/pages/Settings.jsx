@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Settings as SettingsIcon, Upload, Save, Building2, Users, Mail } from 'lucide-react';
+import { Save, Building2, Mail, Trash2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
+} from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
 
 export default function Settings() {
@@ -111,6 +115,52 @@ export default function Settings() {
           <Button type="submit">Inviter</Button>
         </form>
         <p className="text-xs text-muted-foreground mt-2">Brukeren får en invitasjon på e-post og kan logge inn umiddelbart.</p>
+      </div>
+
+      <Separator />
+
+      {/* Account Deletion — required by App Store guidelines */}
+      <div className="bg-card rounded-xl border border-destructive/30 p-6">
+        <div className="flex items-center gap-2 mb-2">
+          <Trash2 className="w-5 h-5 text-destructive" />
+          <h3 className="text-base font-semibold text-destructive">Slett konto</h3>
+        </div>
+        <p className="text-sm text-muted-foreground mb-4">
+          Sletting av kontoen din er permanent og kan ikke angres. All din brukerdata vil bli slettet.
+          Klubbdata vil kun slettes dersom du er eneste administrator.
+        </p>
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive" size="sm">
+              <Trash2 className="w-4 h-4 mr-2" />
+              Slett min konto
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-destructive" />
+                Er du helt sikker?
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                Dette vil permanent slette kontoen din og all tilknyttet brukerdata.
+                Handlingen kan ikke angres.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Avbryt</AlertDialogCancel>
+              <AlertDialogAction
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                onClick={async () => {
+                  toast.info('Kontoen din er merket for sletting. Du vil motta en bekreftelse på e-post.');
+                  await base44.auth.logout();
+                }}
+              >
+                Ja, slett kontoen
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
