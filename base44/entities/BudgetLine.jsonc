@@ -1,0 +1,49 @@
+{
+  "name": "BudgetLine",
+  "type": "object",
+  "properties": {
+    "club_id": {
+      "type": "string"
+    },
+    "season_id": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "membership_fees",
+        "training_fees",
+        "equipment",
+        "tournaments",
+        "travel",
+        "referees",
+        "sponsors",
+        "grants",
+        "rent",
+        "insurance",
+        "other_income",
+        "other_expense"
+      ]
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "income",
+        "expense"
+      ]
+    },
+    "budgeted_amount": {
+      "type": "number"
+    },
+    "description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "club_id",
+    "season_id",
+    "category",
+    "budgeted_amount",
+    "type"
+  ]
+}

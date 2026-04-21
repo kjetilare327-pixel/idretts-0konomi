@@ -1,0 +1,29 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "treasurer",
+        "parent"
+      ],
+      "default": "parent"
+    },
+    "club_id": {
+      "type": "string",
+      "description": "Which club this user belongs to"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "linked_member_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Member IDs linked to this parent"
+    }
+  }
+}

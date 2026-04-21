@@ -1,0 +1,38 @@
+{
+  "name": "PaymentRecord",
+  "type": "object",
+  "properties": {
+    "club_id": {
+      "type": "string"
+    },
+    "payment_requirement_id": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "method": {
+      "type": "string",
+      "enum": [
+        "manual",
+        "bank_transfer",
+        "vipps",
+        "stripe",
+        "cash"
+      ],
+      "default": "manual"
+    },
+    "note": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "payment_requirement_id",
+    "amount",
+    "date"
+  ]
+}

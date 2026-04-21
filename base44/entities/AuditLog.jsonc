@@ -1,0 +1,40 @@
+{
+  "name": "AuditLog",
+  "type": "object",
+  "properties": {
+    "club_id": {
+      "type": "string"
+    },
+    "action": {
+      "type": "string",
+      "description": "e.g. create_transaction, update_payment, delete_member"
+    },
+    "entity_type": {
+      "type": "string",
+      "description": "Which entity was affected"
+    },
+    "entity_id": {
+      "type": "string"
+    },
+    "user_email": {
+      "type": "string"
+    },
+    "details": {
+      "type": "string",
+      "description": "Human-readable description of the change"
+    },
+    "old_value": {
+      "type": "string",
+      "description": "JSON string of old values"
+    },
+    "new_value": {
+      "type": "string",
+      "description": "JSON string of new values"
+    }
+  },
+  "required": [
+    "club_id",
+    "action",
+    "user_email"
+  ]
+}

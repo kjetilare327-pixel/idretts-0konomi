@@ -1,0 +1,52 @@
+{
+  "name": "Club",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Club name"
+    },
+    "org_number": {
+      "type": "string",
+      "description": "Norwegian org number"
+    },
+    "address": {
+      "type": "string"
+    },
+    "logo_url": {
+      "type": "string",
+      "description": "Club logo image URL"
+    },
+    "contact_email": {
+      "type": "string"
+    },
+    "contact_phone": {
+      "type": "string"
+    },
+    "subscription_status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "trial",
+        "suspended",
+        "cancelled"
+      ],
+      "default": "trial"
+    },
+    "subscription_plan": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "annual"
+      ],
+      "default": "monthly"
+    },
+    "trial_ends_at": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

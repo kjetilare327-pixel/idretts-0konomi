@@ -1,0 +1,57 @@
+{
+  "name": "Member",
+  "type": "object",
+  "properties": {
+    "club_id": {
+      "type": "string"
+    },
+    "full_name": {
+      "type": "string"
+    },
+    "birth_year": {
+      "type": "number"
+    },
+    "email": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "team": {
+      "type": "string",
+      "description": "Team/group name"
+    },
+    "parent_email": {
+      "type": "string",
+      "description": "Linked parent/guardian email"
+    },
+    "parent_name": {
+      "type": "string"
+    },
+    "membership_type": {
+      "type": "string",
+      "enum": [
+        "player",
+        "coach",
+        "volunteer",
+        "board_member"
+      ],
+      "default": "player"
+    },
+    "season_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "full_name",
+    "club_id"
+  ]
+}

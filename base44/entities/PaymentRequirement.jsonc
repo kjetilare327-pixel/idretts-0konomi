@@ -1,0 +1,76 @@
+{
+  "name": "PaymentRequirement",
+  "type": "object",
+  "properties": {
+    "club_id": {
+      "type": "string"
+    },
+    "season_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "description": "e.g. Treningsavgift V\u00e5r 2025"
+    },
+    "member_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of member IDs this applies to"
+    },
+    "parent_email": {
+      "type": "string",
+      "description": "Parent email for invoicing"
+    },
+    "total_amount": {
+      "type": "number"
+    },
+    "amount_paid": {
+      "type": "number",
+      "default": 0
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "partial",
+        "paid",
+        "overdue"
+      ],
+      "default": "pending"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "membership_fees",
+        "training_fees",
+        "equipment",
+        "tournaments",
+        "travel",
+        "other"
+      ]
+    },
+    "description": {
+      "type": "string"
+    },
+    "reminder_count": {
+      "type": "number",
+      "default": 0
+    },
+    "last_reminder_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "club_id",
+    "title",
+    "total_amount",
+    "due_date"
+  ]
+}

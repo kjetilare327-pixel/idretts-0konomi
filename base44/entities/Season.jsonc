@@ -1,0 +1,37 @@
+{
+  "name": "Season",
+  "type": "object",
+  "properties": {
+    "club_id": {
+      "type": "string",
+      "description": "Reference to Club"
+    },
+    "name": {
+      "type": "string",
+      "description": "e.g. 2025, V\u00e5r 2025"
+    },
+    "year": {
+      "type": "number"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "archived"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "name",
+    "club_id"
+  ]
+}
