@@ -81,24 +81,6 @@ export default function Dashboard() {
 
   const sendReminderMutation = useMutation({
     mutationFn: async (payment) => {
-      const daysOverdue = payment.due_date
-        ? Math.floor((Date.now() - new Date(payment.due_date).getTime()) / (1000 * 60 * 60 * 24))
-        : 0;
-      const remaining = payment.total_amount - (payment.amount_paid || 0);
-      let tone = 'vennlig og profesjonell';
-      if (daysOverdue > 14) tone = 'tydelig krav om betaling, men høflig';
-      else if (daysOverdue > 7) tone = 'bestemt og profesjonell';
-
-      if (payment.parent_email) {
-        const aiRes = await base44.integrations.Core.InvokeLLM({
-          prompt: `Du er en profesjonell klubbadministrator. Skriv en kort betalingspåminnelse på norsk.\n\nKrav: ${payment.title}\nBeløp: kr ${remaining.toLocaleString('nb-NO')}\nForfallsdato: ${payment.due_date}\nDager siden forfall: ${daysOverdue > 0 ? daysOverdue : 'ikke forfalt ennå'}\nTone: ${tone}\n\nMaks 4 setninger. Avslutt med "Mvh, KlubbFinans". Ingen HTML.`,
-        });
-        await base44.integrations.Core.SendEmail({
-          to: payment.parent_email,
-          subject: `Påminnelse: ${payment.title}`,
-          body: aiRes,
-        });
-      }
       await base44.entities.PaymentRequirement.update(payment.id, {
         reminder_count: (payment.reminder_count || 0) + 1,
         last_reminder_date: new Date().toISOString().split('T')[0],
@@ -106,7 +88,7 @@ export default function Dashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
-      toast.success('Påminnelse sendt');
+      toast.success('Påminnelse registrert i appen');
     },
   });
 

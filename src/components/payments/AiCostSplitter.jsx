@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Sparkles, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
+import { Sparkles, Loader2, ChevronDown, ChevronUp, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { formatNOK } from '@/lib/utils';
@@ -10,6 +10,16 @@ export default function AiCostSplitter({ members = [], onApply }) {
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
+  const [selectedMemberIds, setSelectedMemberIds] = useState([]);
+
+  const toggleMember = (id) => {
+    setSelectedMemberIds(prev =>
+      prev.includes(id) ? prev.filter(m => m !== id) : [...prev, id]
+    );
+  };
+
+  const selectAll = () => setSelectedMemberIds(members.map(m => m.id));
+  const clearAll = () => setSelectedMemberIds([]);
 
   const handleAnalyze = async () => {
     if (!text.trim()) return;
@@ -67,6 +77,44 @@ Returnér KUN JSON, ingen annen tekst.`,
             </Button>
           </div>
 
+          {/* Member selector */}
+          {members.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-xs font-medium text-foreground">Velg spillere det gjelder</p>
+                <div className="flex gap-2">
+                  <button onClick={selectAll} className="text-[10px] text-primary hover:underline">Velg alle</button>
+                  <span className="text-[10px] text-muted-foreground">·</span>
+                  <button onClick={clearAll} className="text-[10px] text-muted-foreground hover:underline">Fjern alle</button>
+                </div>
+              </div>
+              <div className="max-h-36 overflow-y-auto grid grid-cols-2 gap-1 pr-1">
+                {members.filter(m => m.status !== 'inactive').map((m) => {
+                  const selected = selectedMemberIds.includes(m.id);
+                  return (
+                    <button
+                      key={m.id}
+                      onClick={() => toggleMember(m.id)}
+                      className={`flex items-center gap-2 px-2 py-1.5 rounded-lg border text-left text-xs transition-colors ${
+                        selected
+                          ? 'border-primary bg-primary/10 text-primary font-medium'
+                          : 'border-border bg-background text-foreground hover:bg-muted/50'
+                      }`}
+                    >
+                      <div className={`w-4 h-4 rounded flex items-center justify-center flex-shrink-0 ${selected ? 'bg-primary' : 'bg-muted'}`}>
+                        {selected && <Check className="w-2.5 h-2.5 text-primary-foreground" />}
+                      </div>
+                      <span className="truncate">{m.full_name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+              {selectedMemberIds.length > 0 && (
+                <p className="text-[10px] text-muted-foreground mt-1">{selectedMemberIds.length} spiller(e) valgt</p>
+              )}
+            </div>
+          )}
+
           {result && (
             <div className="bg-card rounded-lg border p-3 space-y-2">
               {result.beskrivelse && (
@@ -79,18 +127,22 @@ Returnér KUN JSON, ingen annen tekst.`,
                 </div>
                 <div className="bg-muted/50 rounded-lg p-2">
                   <p className="text-[10px] text-muted-foreground">Spillere</p>
-                  <p className="text-sm font-bold">{result.antall_spillere}</p>
+                  <p className="text-sm font-bold">{selectedMemberIds.length || result.antall_spillere}</p>
                 </div>
                 <div className="bg-accent/10 rounded-lg p-2">
                   <p className="text-[10px] text-muted-foreground">Per spiller</p>
-                  <p className="text-sm font-bold text-accent">{formatNOK(result.belop_per_spiller)}</p>
+                  <p className="text-sm font-bold text-accent">
+                    {formatNOK(selectedMemberIds.length > 0
+                      ? result.total_belop / selectedMemberIds.length
+                      : result.belop_per_spiller)}
+                  </p>
                 </div>
               </div>
               {onApply && (
                 <Button
                   size="sm"
                   className="w-full"
-                  onClick={() => onApply(result)}
+                  onClick={() => onApply({ ...result, member_ids: selectedMemberIds, belop_per_spiller: selectedMemberIds.length > 0 ? result.total_belop / selectedMemberIds.length : result.belop_per_spiller })}
                 >
                   Bruk disse verdiene
                 </Button>
