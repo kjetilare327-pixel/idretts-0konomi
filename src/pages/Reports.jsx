@@ -1,23 +1,9 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Download, FileSpreadsheet, TrendingUp, TrendingDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { TrendingUp, TrendingDown } from 'lucide-react';
 import { formatNOK, CATEGORIES } from '@/lib/utils';
-import { toast } from 'sonner';
-
-function downloadCSV(data, filename) {
-  if (!data.length) return;
-  const headers = Object.keys(data[0]);
-  const csv = [headers.join(';'), ...data.map(row => headers.map(h => `"${row[h] ?? ''}"`).join(';'))].join('\n');
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-}
+import ExportButtons from '@/components/reports/ExportButtons';
 
 export default function Reports() {
   const { data: transactions = [] } = useQuery({
@@ -28,6 +14,11 @@ export default function Reports() {
   const { data: payments = [] } = useQuery({
     queryKey: ['payments'],
     queryFn: () => base44.entities.PaymentRequirement.list('-created_date', 500),
+  });
+
+  const { data: members = [] } = useQuery({
+    queryKey: ['members'],
+    queryFn: () => base44.entities.Member.list('-created_date', 500),
   });
 
   // P&L
@@ -47,25 +38,6 @@ export default function Reports() {
   const totalExpense = Object.values(expenseByCategory).reduce((s, v) => s + v, 0);
   const result = totalIncome - totalExpense;
 
-  const exportTransactions = () => {
-    downloadCSV(transactions.map(t => ({
-      Dato: t.date, Type: t.type === 'income' ? 'Inntekt' : 'Utgift',
-      Beløp: t.amount, Kategori: CATEGORIES[t.category]?.label || t.category,
-      Beskrivelse: t.description || '',
-    })), 'transaksjoner.csv');
-    toast.success('Eksportert til CSV');
-  };
-
-  const exportUnpaid = () => {
-    const unpaid = payments.filter(p => p.status !== 'paid');
-    downloadCSV(unpaid.map(p => ({
-      Tittel: p.title, Beløp: p.total_amount, Betalt: p.amount_paid || 0,
-      Gjenstående: p.total_amount - (p.amount_paid || 0), Forfallsdato: p.due_date,
-      Status: p.status, Epost: p.parent_email || '',
-    })), 'ubetalte_krav.csv');
-    toast.success('Eksportert til CSV');
-  };
-
   const hasData = transactions.length > 0;
 
   return (
@@ -75,14 +47,7 @@ export default function Reports() {
           <h1 className="text-2xl font-bold">Rapporter</h1>
           <p className="text-sm text-muted-foreground mt-1">Resultatregnskap og eksport</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={exportTransactions}>
-            <FileSpreadsheet className="w-4 h-4 mr-2" /> Eksporter transaksjoner
-          </Button>
-          <Button variant="outline" onClick={exportUnpaid}>
-            <Download className="w-4 h-4 mr-2" /> Eksporter ubetalte
-          </Button>
-        </div>
+        <ExportButtons transactions={transactions} payments={payments} members={members} />
       </div>
 
       {/* Empty state */}

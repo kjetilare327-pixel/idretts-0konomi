@@ -27,9 +27,13 @@ export default function Onboarding() {
   const handleCreate = async (e) => {
     e.preventDefault();
     setLoading(true);
+    const trialEnd = new Date();
+    trialEnd.setDate(trialEnd.getDate() + 21);
     const club = await base44.entities.Club.create({
       name: clubName,
       join_code: generateJoinCode(),
+      subscription_status: 'trial',
+      trial_ends_at: trialEnd.toISOString().split('T')[0],
     });
     await base44.auth.updateMe({ role: 'admin', club_id: club.id });
     queryClient.invalidateQueries({ queryKey: ['clubs'] });
