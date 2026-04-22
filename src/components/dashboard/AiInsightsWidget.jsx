@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Sparkles, Loader2, TrendingUp, AlertTriangle, Lightbulb, RefreshCw } from 'lucide-react';
+import { Sparkles, Loader2, TrendingUp, AlertTriangle, Lightbulb, RefreshCw, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatNOK } from '@/lib/utils';
 
@@ -8,7 +8,7 @@ const icons = [TrendingUp, Lightbulb, AlertTriangle];
 const iconColors = ['text-green-600', 'text-blue-600', 'text-yellow-600'];
 const bgColors = ['bg-green-50 dark:bg-green-950/30', 'bg-blue-50 dark:bg-blue-950/30', 'bg-yellow-50 dark:bg-yellow-950/30'];
 
-export default function AiInsightsWidget({ totalIncome, totalExpenses, unpaidTotal }) {
+export default function AiInsightsWidget({ totalIncome, totalExpenses, unpaidTotal, unpaidCount = 0, overdueCount = 0 }) {
   const [insights, setInsights] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -21,7 +21,7 @@ export default function AiInsightsWidget({ totalIncome, totalExpenses, unpaidTot
 - Inntekter i år: ${formatNOK(totalIncome)}
 - Utgifter i år: ${formatNOK(totalExpenses)}
 - Netto: ${formatNOK(totalIncome - totalExpenses)}
-- Utestående betalinger: ${formatNOK(unpaidTotal)}
+- Utestående betalinger: ${formatNOK(unpaidTotal)} (${unpaidCount} krav, ${overdueCount} forfalt)
 
 Regler:
 - Hver innsikt skal være maks 2 setninger
@@ -48,11 +48,16 @@ Regler:
     setLoading(false);
   };
 
+  // Preview stats shown before analysis
+  const hasData = totalIncome > 0 || totalExpenses > 0 || unpaidTotal > 0;
+
   return (
-    <div className="bg-card rounded-xl border border-border p-4">
+    <div className="bg-gradient-to-br from-primary/5 to-accent/5 rounded-xl border border-primary/20 p-4">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-primary" />
+          <div className="w-7 h-7 rounded-lg bg-primary/10 flex items-center justify-center">
+            <Sparkles className="w-4 h-4 text-primary" />
+          </div>
           <h3 className="text-sm font-semibold">AI Økonomiinnsikt</h3>
         </div>
         <Button
@@ -60,21 +65,44 @@ Regler:
           variant={insights ? 'outline' : 'default'}
           onClick={fetchInsights}
           disabled={loading}
-          className="h-7 text-xs"
+          className="h-7 text-xs gap-1"
         >
-          {loading ? (
-            <Loader2 className="w-3 h-3 animate-spin mr-1" />
-          ) : (
-            <RefreshCw className="w-3 h-3 mr-1" />
-          )}
-          {insights ? 'Oppdater' : 'Analyser'}
+          {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+          {insights ? 'Oppdater' : 'Analyser nå'}
         </Button>
       </div>
 
+      {/* Pre-analysis preview */}
       {!insights && !loading && (
-        <p className="text-xs text-muted-foreground text-center py-4">
-          Klikk «Analyser» for å få AI-baserte innsikter om klubbens økonomi.
-        </p>
+        <div className="space-y-2">
+          {overdueCount > 0 && (
+            <div className="flex items-center gap-2 p-2.5 bg-red-50 dark:bg-red-950/30 rounded-lg border border-red-200 dark:border-red-900">
+              <AlertTriangle className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
+              <p className="text-xs text-red-700 dark:text-red-300">
+                <strong>{overdueCount} krav</strong> er forfalt — send purring nå
+              </p>
+            </div>
+          )}
+          {unpaidCount > 0 && (
+            <div className="flex items-center gap-2 p-2.5 bg-yellow-50 dark:bg-yellow-950/30 rounded-lg border border-yellow-200 dark:border-yellow-900">
+              <TrendingUp className="w-3.5 h-3.5 text-yellow-600 flex-shrink-0" />
+              <p className="text-xs text-yellow-700 dark:text-yellow-300">
+                <strong>{formatNOK(unpaidTotal)}</strong> utestående totalt ({unpaidCount} krav)
+              </p>
+            </div>
+          )}
+          {!hasData && (
+            <p className="text-xs text-muted-foreground text-center py-3">
+              Klikk «Analyser nå» for AI-baserte innsikter om klubbens økonomi.
+            </p>
+          )}
+          {hasData && (
+            <button onClick={fetchInsights} className="w-full flex items-center justify-between p-2.5 rounded-lg bg-primary/10 hover:bg-primary/15 transition-colors">
+              <span className="text-xs text-primary font-medium">Få personlige anbefalinger</span>
+              <ChevronRight className="w-3.5 h-3.5 text-primary" />
+            </button>
+          )}
+        </div>
       )}
 
       {loading && (

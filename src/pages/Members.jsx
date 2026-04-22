@@ -127,6 +127,32 @@ export default function Members() {
       <div className="bg-card rounded-xl border border-border overflow-hidden">
         {isLoading ? (
           <div className="p-12 text-center text-muted-foreground">Laster...</div>
+        ) : members.length === 0 ? (
+          <div className="flex flex-col items-center py-14 px-6 text-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <Users className="w-7 h-7 text-primary" />
+            </div>
+            <div>
+              <p className="text-base font-semibold text-foreground">Ingen medlemmer ennå</p>
+              <p className="text-sm text-muted-foreground mt-1">Legg til spillere, trenere og andre for å holde oversikt over betalinger og aktivitet.</p>
+            </div>
+            <Button onClick={() => setShowForm(true)} size="lg" className="mt-1">
+              <Plus className="w-4 h-4 mr-2" /> Legg til første medlem
+            </Button>
+            <label className="cursor-pointer text-sm text-primary underline-offset-4 hover:underline flex items-center gap-1">
+              <Search className="w-3.5 h-3.5" />
+              Importer fra Excel/CSV
+              <input
+                type="file"
+                accept=".csv,.xlsx"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) toast.info('Import-funksjon kommer snart. Legg til medlemmer manuelt foreløpig.');
+                }}
+              />
+            </label>
+          </div>
         ) : filtered.length === 0 ? (
           <div className="p-12 text-center text-muted-foreground">
             <Users className="w-10 h-10 mx-auto mb-3 opacity-40" />

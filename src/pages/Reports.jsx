@@ -66,6 +66,8 @@ export default function Reports() {
     toast.success('Eksportert til CSV');
   };
 
+  const hasData = transactions.length > 0;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -83,8 +85,24 @@ export default function Reports() {
         </div>
       </div>
 
+      {/* Empty state */}
+      {!hasData && (
+        <div className="bg-card rounded-xl border border-border flex flex-col items-center py-16 px-6 text-center gap-4">
+          <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <TrendingUp className="w-7 h-7 text-primary" />
+          </div>
+          <div>
+            <p className="text-base font-semibold text-foreground">Ingen data å rapportere ennå</p>
+            <p className="text-sm text-muted-foreground mt-1">Når du har registrert transaksjoner vil du se resultatregnskap og eksportmuligheter her.</p>
+          </div>
+          <a href="/transactions?action=add" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
+            <TrendingUp className="w-4 h-4" /> Registrer din første transaksjon
+          </a>
+        </div>
+      )}
+
       {/* P&L */}
-      <div className="bg-card rounded-xl border border-border overflow-hidden">
+      {hasData && <div className="bg-card rounded-xl border border-border overflow-hidden">
         <div className="p-5 border-b border-border">
           <h3 className="font-semibold">Resultatregnskap</h3>
         </div>
@@ -138,7 +156,7 @@ export default function Reports() {
             </span>
           </div>
         </div>
-      </div>
+      </div>}
     </div>
   );
 }

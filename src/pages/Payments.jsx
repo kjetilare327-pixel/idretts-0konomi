@@ -166,6 +166,22 @@ Regler:
       <div className="space-y-3">
         {isLoading ? (
           <div className="p-12 text-center text-muted-foreground">Laster...</div>
+        ) : payments.length === 0 ? (
+          <div className="bg-card rounded-xl border border-border flex flex-col items-center py-14 px-6 text-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <CreditCard className="w-7 h-7 text-primary" />
+            </div>
+            <div>
+              <p className="text-base font-semibold text-foreground">Ingen betalingskrav ennå</p>
+              <p className="text-sm text-muted-foreground mt-1">Opprett ditt første krav og send purringer direkte til foresatte.</p>
+            </div>
+            <Button onClick={() => setShowForm(true)} size="lg" className="mt-1">
+              <Plus className="w-4 h-4 mr-2" /> Opprett første betalingskrav
+            </Button>
+            <p className="text-xs text-muted-foreground max-w-xs">
+              Tips: Krav kan knyttes til enkeltmedlemmer og sendes som automatisk purring ved forfall.
+            </p>
+          </div>
         ) : filtered.length === 0 ? (
           <div className="bg-card rounded-xl border border-border p-12 text-center text-muted-foreground">
             <CreditCard className="w-10 h-10 mx-auto mb-3 opacity-40" />

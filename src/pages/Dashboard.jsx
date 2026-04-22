@@ -8,6 +8,7 @@ import QuickActions from '@/components/dashboard/QuickActions';
 import UnpaidWidget from '@/components/dashboard/UnpaidWidget';
 import IncomeExpenseChart from '@/components/dashboard/IncomeExpenseChart';
 import AiInsightsWidget from '@/components/dashboard/AiInsightsWidget';
+import RecentActivity from '@/components/dashboard/RecentActivity';
 import { toast } from 'sonner';
 
 export default function Dashboard() {
@@ -28,7 +29,31 @@ export default function Dashboard() {
   const totalIncome = ytdTransactions.filter(t => t.type === 'income').reduce((s, t) => s + (t.amount || 0), 0);
   const totalExpenses = ytdTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + (t.amount || 0), 0);
   const balance = totalIncome - totalExpenses;
-  const unpaidTotal = payments.filter(p => p.status !== 'paid').reduce((s, p) => s + (p.total_amount - (p.amount_paid || 0)), 0);
+  const unpaidPayments = payments.filter(p => p.status !== 'paid');
+  const unpaidTotal = unpaidPayments.reduce((s, p) => s + (p.total_amount - (p.amount_paid || 0)), 0);
+  const overdueCount = unpaidPayments.filter(p => p.due_date && new Date(p.due_date) < new Date()).length;
+
+  // Trends: compare to previous month
+  const now = new Date();
+  const thisMonth = now.getMonth();
+  const prevMonth = thisMonth === 0 ? 11 : thisMonth - 1;
+  const prevYear = thisMonth === 0 ? currentYear - 1 : currentYear;
+  const prevMonthTx = transactions.filter(t => {
+    const d = new Date(t.date);
+    return d.getFullYear() === prevYear && d.getMonth() === prevMonth;
+  });
+  const thisMonthTx = transactions.filter(t => {
+    const d = new Date(t.date);
+    return d.getFullYear() === currentYear && d.getMonth() === thisMonth;
+  });
+  const calcTrend = (curr, prev) => prev === 0 ? null : Math.round(((curr - prev) / prev) * 100);
+
+  const thisMonthIncome = thisMonthTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+  const prevMonthIncome = prevMonthTx.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+  const thisMonthExpense = thisMonthTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+  const prevMonthExpense = prevMonthTx.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+  const incomeTrend = calcTrend(thisMonthIncome, prevMonthIncome);
+  const expenseTrend = calcTrend(thisMonthExpense, prevMonthExpense);
 
   const markPaidMutation = useMutation({
     mutationFn: async (payment) => {
@@ -95,9 +120,12 @@ export default function Dashboard() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard title="Saldo" value={formatNOK(balance)} icon={Wallet} variant={balance >= 0 ? 'success' : 'danger'} />
-        <StatCard title="Inntekter i år" value={formatNOK(totalIncome)} icon={TrendingUp} variant="success" />
-        <StatCard title="Utgifter i år" value={formatNOK(totalExpenses)} icon={TrendingDown} variant="danger" />
-        <StatCard title="Utestående" value={formatNOK(unpaidTotal)} icon={AlertTriangle} variant="warning" subtitle={`${payments.filter(p => p.status !== 'paid').length} krav`} />
+        <StatCard title="Inntekter i år" value={formatNOK(totalIncome)} icon={TrendingUp} variant="success"
+          trend={incomeTrend !== null ? { value: incomeTrend, label: 'vs. forrige mnd' } : undefined} />
+        <StatCard title="Utgifter i år" value={formatNOK(totalExpenses)} icon={TrendingDown} variant="danger"
+          trend={expenseTrend !== null ? { value: expenseTrend, label: 'vs. forrige mnd' } : undefined} />
+        <StatCard title="Utestående" value={formatNOK(unpaidTotal)} icon={AlertTriangle} variant="warning"
+          subtitle={`${unpaidPayments.length} krav${overdueCount > 0 ? ` · ${overdueCount} forfalt` : ''}`} />
       </div>
 
       {/* Quick Actions */}
@@ -105,8 +133,9 @@ export default function Dashboard() {
 
       {/* Main content grid */}
       <div className="grid lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-3 space-y-6">
           <IncomeExpenseChart transactions={ytdTransactions} />
+          <RecentActivity transactions={transactions.slice(0, 5)} />
         </div>
         <div className="lg:col-span-2 space-y-6">
           <UnpaidWidget
@@ -118,6 +147,8 @@ export default function Dashboard() {
             totalIncome={totalIncome}
             totalExpenses={totalExpenses}
             unpaidTotal={unpaidTotal}
+            unpaidCount={unpaidPayments.length}
+            overdueCount={overdueCount}
           />
         </div>
       </div>

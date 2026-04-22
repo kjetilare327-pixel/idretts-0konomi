@@ -1,7 +1,10 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
+// trend can be a number (legacy) or { value: number, label: string }
 export default function StatCard({ title, value, subtitle, icon: Icon, trend, trendLabel, variant = 'default' }) {
+  const trendValue = typeof trend === 'object' ? trend?.value : trend;
+  const trendLabelText = typeof trend === 'object' ? trend?.label : trendLabel;
   const variants = {
     default: 'border-border',
     success: 'border-l-4 border-l-green-500',
@@ -24,12 +27,12 @@ export default function StatCard({ title, value, subtitle, icon: Icon, trend, tr
           </div>
         )}
       </div>
-      {trend !== undefined && (
+      {trendValue !== undefined && trendValue !== null && (
         <div className="mt-3 flex items-center gap-1.5 text-xs">
-          <span className={cn("font-semibold", trend >= 0 ? "text-green-600" : "text-red-600")}>
-            {trend >= 0 ? '+' : ''}{trend}%
+          <span className={cn("font-semibold", trendValue >= 0 ? "text-green-600" : "text-red-600")}>
+            {trendValue >= 0 ? '↑' : '↓'} {Math.abs(trendValue)}%
           </span>
-          {trendLabel && <span className="text-muted-foreground">{trendLabel}</span>}
+          {trendLabelText && <span className="text-muted-foreground">{trendLabelText}</span>}
         </div>
       )}
     </div>

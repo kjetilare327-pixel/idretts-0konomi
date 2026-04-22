@@ -108,6 +108,26 @@ export default function Transactions() {
       <div className="bg-card rounded-xl border border-border overflow-hidden">
         {isLoading ? (
           <div className="p-12 text-center text-muted-foreground">Laster...</div>
+        ) : transactions.length === 0 ? (
+          <div className="flex flex-col items-center py-14 px-6 text-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <ArrowUpRight className="w-7 h-7 text-primary" />
+            </div>
+            <div>
+              <p className="text-base font-semibold text-foreground">Ingen transaksjoner ennå</p>
+              <p className="text-sm text-muted-foreground mt-1">Registrer din første inntekt eller utgift for å komme i gang.</p>
+            </div>
+            <Button onClick={() => { setInitialType('income'); setShowForm(true); }} size="lg" className="mt-1">
+              <Plus className="w-4 h-4 mr-2" /> Registrer første transaksjon
+            </Button>
+            <button
+              onClick={() => { setInitialType('income'); setShowForm(true); }}
+              className="text-sm text-primary underline-offset-4 hover:underline flex items-center gap-1"
+            >
+              <Filter className="w-3.5 h-3.5" />
+              Eller beskriv med tekst: «2000 kr mat til 5 spillere»
+            </button>
+          </div>
         ) : filtered.length === 0 ? (
           <div className="p-12 text-center text-muted-foreground">Ingen transaksjoner funnet</div>
         ) : (

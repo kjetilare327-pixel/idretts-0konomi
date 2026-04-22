@@ -3,6 +3,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import BottomTabs from './BottomTabs';
 import TopBar from './TopBar';
+import FloatingActionButton from './FloatingActionButton';
 import { useAuth } from '@/lib/AuthContext';
 
 const PAGE_TITLES = {
@@ -56,6 +57,9 @@ export default function AppLayout() {
 
       {/* Bottom tabs – mobile only */}
       <BottomTabs />
+
+      {/* Floating Action Button */}
+      <FloatingActionButton />
     </div>
   );
 }
