@@ -1,0 +1,26 @@
+{
+  "name": "AutomationSettings",
+  "type": "object",
+  "properties": {
+    "club_id": {
+      "type": "string"
+    },
+    "auto_reminder_enabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "first_reminder_days": {
+      "type": "number",
+      "default": 7,
+      "description": "Days after due date to send first reminder"
+    },
+    "repeat_reminder_days": {
+      "type": "number",
+      "default": 7,
+      "description": "Days between subsequent reminders"
+    }
+  },
+  "required": [
+    "club_id"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "name": "LiquidityEntry",
+  "type": "object",
+  "properties": {
+    "club_id": {
+      "type": "string"
+    },
+    "year": {
+      "type": "number"
+    },
+    "month": {
+      "type": "number",
+      "description": "1-12"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "income",
+        "expense"
+      ]
+    },
+    "category": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "club_id",
+    "year",
+    "month",
+    "type",
+    "amount"
+  ]
+}

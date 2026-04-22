@@ -20,6 +20,8 @@ import AuditLog from '@/pages/AuditLog';
 import Settings from '@/pages/Settings';
 import Onboarding from '@/pages/Onboarding';
 import AiAssistant from '@/pages/AiAssistant';
+import Automation from '@/pages/Automation';
+import Liquidity from '@/pages/Liquidity';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 
@@ -86,6 +88,8 @@ const AuthenticatedApp = () => {
         <Route path="/audit-log" element={<AuditLog />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/ai-assistant" element={<AiAssistant />} />
+        <Route path="/automation" element={<Automation />} />
+        <Route path="/liquidity" element={<Liquidity />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

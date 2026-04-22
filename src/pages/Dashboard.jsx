@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { Wallet, TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react';
 import { formatNOK } from '@/lib/utils';
 import StatCard from '@/components/dashboard/StatCard';
@@ -9,11 +10,15 @@ import UnpaidWidget from '@/components/dashboard/UnpaidWidget';
 import IncomeExpenseChart from '@/components/dashboard/IncomeExpenseChart';
 import AiInsightsWidget from '@/components/dashboard/AiInsightsWidget';
 import RecentActivity from '@/components/dashboard/RecentActivity';
+import TeamFilter from '@/components/dashboard/TeamFilter';
+import ProblemBox from '@/components/dashboard/ProblemBox';
 import { toast } from 'sonner';
 
 export default function Dashboard() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const currentYear = new Date().getFullYear();
+  const [teamFilter, setTeamFilter] = useState('all');
 
   const { data: transactions = [] } = useQuery({
     queryKey: ['transactions'],
@@ -25,11 +30,38 @@ export default function Dashboard() {
     queryFn: () => base44.entities.PaymentRequirement.list('-due_date', 200),
   });
 
-  const ytdTransactions = transactions.filter(t => new Date(t.date).getFullYear() === currentYear);
+  const { data: members = [] } = useQuery({
+    queryKey: ['members'],
+    queryFn: () => base44.entities.Member.list('-created_date', 500),
+  });
+
+  // Extract unique teams
+  const teams = useMemo(() => {
+    const t = new Set(members.map(m => m.team).filter(Boolean));
+    return Array.from(t).sort();
+  }, [members]);
+
+  // Filter transactions by team (via member link)
+  const teamMemberIds = useMemo(() => {
+    if (teamFilter === 'all') return null;
+    return new Set(members.filter(m => m.team === teamFilter).map(m => m.id));
+  }, [teamFilter, members]);
+
+  const filteredTransactions = useMemo(() => {
+    if (teamFilter === 'all') return transactions;
+    return transactions.filter(t => t.member_id && teamMemberIds?.has(t.member_id));
+  }, [transactions, teamFilter, teamMemberIds]);
+
+  const filteredPayments = useMemo(() => {
+    if (teamFilter === 'all') return payments;
+    return payments.filter(p => (p.member_ids || []).some(id => teamMemberIds?.has(id)));
+  }, [payments, teamFilter, teamMemberIds]);
+
+  const ytdTransactions = filteredTransactions.filter(t => new Date(t.date).getFullYear() === currentYear);
   const totalIncome = ytdTransactions.filter(t => t.type === 'income').reduce((s, t) => s + (t.amount || 0), 0);
   const totalExpenses = ytdTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + (t.amount || 0), 0);
   const balance = totalIncome - totalExpenses;
-  const unpaidPayments = payments.filter(p => p.status !== 'paid');
+  const unpaidPayments = filteredPayments.filter(p => p.status !== 'paid');
   const unpaidTotal = unpaidPayments.reduce((s, p) => s + (p.total_amount - (p.amount_paid || 0)), 0);
   const overdueCount = unpaidPayments.filter(p => p.due_date && new Date(p.due_date) < new Date()).length;
 
@@ -94,10 +126,18 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-sm text-muted-foreground mt-1">Oversikt over klubbens økonomi</p>
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+          <p className="text-sm text-muted-foreground mt-1">Oversikt over klubbens økonomi</p>
+        </div>
+        {teams.length > 0 && (
+          <TeamFilter teams={teams} value={teamFilter} onChange={setTeamFilter} />
+        )}
       </div>
+
+      {/* Problem box */}
+      <ProblemBox payments={payments} members={members} teamFilter={teamFilter} />
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -117,7 +157,7 @@ export default function Dashboard() {
       <div className="grid lg:grid-cols-5 gap-6">
         <div className="lg:col-span-3 space-y-6">
           <IncomeExpenseChart transactions={ytdTransactions} />
-          <RecentActivity transactions={transactions.slice(0, 5)} />
+          <RecentActivity transactions={filteredTransactions.slice(0, 5)} />
         </div>
         <div className="lg:col-span-2 space-y-6">
           <UnpaidWidget
