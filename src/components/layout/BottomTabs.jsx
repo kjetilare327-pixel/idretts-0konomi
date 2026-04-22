@@ -1,13 +1,13 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, CreditCard, ArrowLeftRight, Users, Settings } from 'lucide-react';
+import { LayoutDashboard, CreditCard, Users, Bot, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const tabs = [
   { path: '/',             label: 'Dashboard',  icon: LayoutDashboard },
-  { path: '/transactions', label: 'Transaksjoner', icon: ArrowLeftRight },
   { path: '/payments',     label: 'Betalinger', icon: CreditCard },
   { path: '/members',      label: 'Medlemmer',  icon: Users },
+  { path: '/ai-assistant', label: 'AI Assistent', icon: Bot },
   { path: '/settings',     label: 'Innstillinger', icon: Settings },
 ];
 

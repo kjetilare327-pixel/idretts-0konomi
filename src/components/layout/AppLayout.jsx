@@ -17,8 +17,7 @@ const PAGE_TITLES = {
   '/audit-log': 'Revisjonslogg',
   '/settings': 'Innstillinger',
   '/dugnad': 'Dugnadskalkulator',
-  '/mva': 'MVA-kompensasjon',
-  '/transparens': 'Transparens',
+  '/ai-assistant': 'AI Assistent',
 };
 
 export default function AppLayout() {

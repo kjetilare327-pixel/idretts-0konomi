@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, ArrowLeftRight, CreditCard,
   Users, FileText, Settings, X, ChevronLeft,
-  Calculator, Receipt, Eye
+  Calculator, Bot
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -12,10 +12,9 @@ const navItems = [
   { path: '/transactions', label: 'Transaksjoner', icon: ArrowLeftRight },
   { path: '/payments', label: 'Betalinger', icon: CreditCard },
   { path: '/members', label: 'Medlemmer', icon: Users },
-  { path: '/reports', label: 'Rapporter', icon: FileText },
   { path: '/dugnad', label: 'Dugnadskalkulator', icon: Calculator },
-  { path: '/mva', label: 'MVA-kompensasjon', icon: Receipt },
-  { path: '/transparens', label: 'Transparens', icon: Eye },
+  { path: '/reports', label: 'Rapporter', icon: FileText },
+  { path: '/ai-assistant', label: 'AI Assistent', icon: Bot },
   { path: '/settings', label: 'Innstillinger', icon: Settings },
 ];
 
