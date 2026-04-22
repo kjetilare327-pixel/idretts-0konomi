@@ -16,7 +16,6 @@ const PAGE_TITLES = {
   '/reports': 'Rapporter',
   '/audit-log': 'Revisjonslogg',
   '/settings': 'Innstillinger',
-  '/dugnad': 'Dugnadskalkulator',
   '/ai-assistant': 'AI Assistent',
 };
 

@@ -19,7 +19,6 @@ import Reports from '@/pages/Reports';
 import AuditLog from '@/pages/AuditLog';
 import Settings from '@/pages/Settings';
 import Onboarding from '@/pages/Onboarding';
-import Dugnad from '@/pages/Dugnad';
 import AiAssistant from '@/pages/AiAssistant';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
@@ -85,7 +84,6 @@ const AuthenticatedApp = () => {
         <Route path="/reports" element={<Reports />} />
         <Route path="/audit-log" element={<AuditLog />} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="/dugnad" element={<Dugnad />} />
         <Route path="/ai-assistant" element={<AiAssistant />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
