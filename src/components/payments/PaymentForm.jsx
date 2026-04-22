@@ -32,7 +32,7 @@ export default function PaymentForm({ members, onSubmit, onCancel }) {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <Label>Tittel</Label>
-          <Input placeholder="f.eks. Treningsavgift vår 2025" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+          <Input placeholder="Tittel" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -58,12 +58,12 @@ export default function PaymentForm({ members, onSubmit, onCancel }) {
           </div>
           <div>
             <Label>Foresatt e-post</Label>
-            <Input type="email" placeholder="foresatt@epost.no" value={form.parent_email} onChange={(e) => setForm({ ...form, parent_email: e.target.value })} />
+            <Input type="email" placeholder="" value={form.parent_email} onChange={(e) => setForm({ ...form, parent_email: e.target.value })} />
           </div>
         </div>
         <div>
           <Label>Beskrivelse</Label>
-          <Textarea placeholder="Valgfri beskrivelse..." value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+          <Textarea placeholder="" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
         </div>
         <div className="flex justify-end gap-3">
           <Button type="button" variant="outline" onClick={onCancel}>Avbryt</Button>
