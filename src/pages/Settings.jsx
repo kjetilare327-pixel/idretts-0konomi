@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Save, Building2, Mail, Trash2, AlertTriangle, Hash } from 'lucide-react';
+import { Save, Building2, Mail, Trash2, AlertTriangle, Hash, Sun, Moon, Monitor } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { useTheme } from '@/lib/ThemeContext';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
@@ -14,6 +15,7 @@ import { toast } from 'sonner';
 
 export default function Settings() {
   const queryClient = useQueryClient();
+  const { theme, setTheme } = useTheme();
   const [clubForm, setClubForm] = useState({ name: '', org_number: '', address: '', contact_email: '', contact_phone: '' });
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('parent');
@@ -97,6 +99,34 @@ export default function Settings() {
             <Save className="w-4 h-4 mr-2" /> Lagre
           </Button>
         </form>
+      </div>
+
+      {/* Theme */}
+      <div className="bg-card rounded-xl border border-border p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Sun className="w-5 h-5 text-muted-foreground" />
+          <h3 className="text-base font-semibold">Utseende</h3>
+        </div>
+        <div className="flex gap-2">
+          {[
+            { value: 'light', label: 'Lys', icon: Sun },
+            { value: 'dark', label: 'Mørk', icon: Moon },
+            { value: 'system', label: 'System', icon: Monitor },
+          ].map(({ value, label, icon: Icon }) => (
+            <button
+              key={value}
+              onClick={() => setTheme(value)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                theme === value
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border bg-background hover:bg-muted'
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <Separator />

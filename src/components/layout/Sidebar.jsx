@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, ArrowLeftRight, CreditCard, Receipt,
-  Users, Calendar, BarChart3, Shield, Settings, X, ChevronLeft
+  LayoutDashboard, ArrowLeftRight, CreditCard,
+  Users, FileText, Settings, X, ChevronLeft
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -10,12 +10,8 @@ const navItems = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/transactions', label: 'Transaksjoner', icon: ArrowLeftRight },
   { path: '/payments', label: 'Betalinger', icon: CreditCard },
-  { path: '/expenses', label: 'Utgifter', icon: Receipt },
   { path: '/members', label: 'Medlemmer', icon: Users },
-  { path: '/seasons', label: 'Sesonger', icon: Calendar },
-  { path: '/budget', label: 'Budsjett', icon: BarChart3 },
-  { path: '/reports', label: 'Rapporter', icon: BarChart3 },
-  { path: '/audit-log', label: 'Revisjonslogg', icon: Shield },
+  { path: '/reports', label: 'Rapporter', icon: FileText },
   { path: '/settings', label: 'Innstillinger', icon: Settings },
 ];
 

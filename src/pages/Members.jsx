@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Plus, Users, Search, Edit2, Trash2, Upload } from 'lucide-react';
+import { Plus, Users, Search, Edit2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import MemberBalanceBadge from '@/components/members/MemberBalanceBadge';
 import { toast } from 'sonner';
 
 export default function Members() {
@@ -21,6 +22,23 @@ export default function Members() {
     queryKey: ['members'],
     queryFn: () => base44.entities.Member.list('-created_date', 500),
   });
+
+  const { data: payments = [] } = useQuery({
+    queryKey: ['payments'],
+    queryFn: () => base44.entities.PaymentRequirement.list('-created_date', 500),
+  });
+
+  // Compute balance per member: sum of (total_amount - amount_paid) for their payment requirements
+  const memberBalances = useMemo(() => {
+    const map = {};
+    payments.forEach((p) => {
+      (p.member_ids || []).forEach((mid) => {
+        if (!map[mid]) map[mid] = 0;
+        map[mid] += (p.total_amount || 0) - (p.amount_paid || 0);
+      });
+    });
+    return map;
+  }, [payments]);
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Member.create({ ...data, birth_year: data.birth_year ? parseInt(data.birth_year) : undefined, status: 'active' }),
@@ -122,6 +140,9 @@ export default function Members() {
                       {m.team && <Badge variant="secondary" className="text-[10px] px-1.5 py-0">{m.team}</Badge>}
                       <Badge variant="outline" className="text-[10px] px-1.5 py-0">{typeLabels[m.membership_type] || m.membership_type}</Badge>
                       {m.birth_year && <span className="text-xs text-muted-foreground">f. {m.birth_year}</span>}
+                      {memberBalances[m.id] !== undefined && (
+                        <MemberBalanceBadge balance={memberBalances[m.id]} />
+                      )}
                     </div>
                   </div>
                 </div>
