@@ -16,6 +16,9 @@ const PAGE_TITLES = {
   '/reports': 'Rapporter',
   '/audit-log': 'Revisjonslogg',
   '/settings': 'Innstillinger',
+  '/dugnad': 'Dugnadskalkulator',
+  '/mva': 'MVA-kompensasjon',
+  '/transparens': 'Transparens',
 };
 
 export default function AppLayout() {

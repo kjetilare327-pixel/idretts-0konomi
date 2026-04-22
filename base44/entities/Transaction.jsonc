@@ -54,6 +54,11 @@
     "payment_requirement_id": {
       "type": "string",
       "description": "Optional link to payment requirement"
+    },
+    "mva_eligible": {
+      "type": "boolean",
+      "default": false,
+      "description": "Marked as eligible for MVA compensation"
     }
   },
   "required": [
