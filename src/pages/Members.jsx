@@ -16,7 +16,7 @@ export default function Members() {
   const [showForm, setShowForm] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
   const [search, setSearch] = useState('');
-  const [form, setForm] = useState({ full_name: '', birth_year: '', email: '', phone: '', team: '', parent_email: '', parent_name: '', membership_type: 'player' });
+  const [form, setForm] = useState({ full_name: '', birth_year: '', email: '', phone: '', team: '', parent_email: '', parent_name: '', membership_type: 'player', status: 'active' });
 
   const { data: members = [], isLoading } = useQuery({
     queryKey: ['members'],
@@ -200,51 +200,55 @@ export default function Members() {
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-3">
             <div>
-              <Label>Fullt navn *</Label>
-              <Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} required />
+              <Label>Fornavn *</Label>
+              <Input placeholder="f.eks. Ola" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} required autoFocus />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label>Fødselsår</Label>
-                <Input type="number" min="1950" max="2025" value={form.birth_year} onChange={(e) => setForm({ ...form, birth_year: e.target.value })} />
-              </div>
-              <div>
-                <Label>Type</Label>
-                <Select value={form.membership_type} onValueChange={(v) => setForm({ ...form, membership_type: v })}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="player">Spiller</SelectItem>
-                    <SelectItem value="coach">Trener</SelectItem>
-                    <SelectItem value="volunteer">Frivillig</SelectItem>
-                    <SelectItem value="board_member">Styremedlem</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div>
-              <Label>Lag/gruppe</Label>
-              <Input placeholder="f.eks. Gutter 2012" value={form.team} onChange={(e) => setForm({ ...form, team: e.target.value })} />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label>E-post</Label>
-                <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
-              </div>
-              <div>
-                <Label>Telefon</Label>
-                <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label>Foresatt navn</Label>
-                <Input value={form.parent_name} onChange={(e) => setForm({ ...form, parent_name: e.target.value })} />
-              </div>
-              <div>
-                <Label>Foresatt e-post</Label>
-                <Input type="email" value={form.parent_email} onChange={(e) => setForm({ ...form, parent_email: e.target.value })} />
-              </div>
-            </div>
+            {editingMember && (
+              <>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Fødselsår</Label>
+                    <Input type="number" min="1950" max="2025" value={form.birth_year} onChange={(e) => setForm({ ...form, birth_year: e.target.value })} />
+                  </div>
+                  <div>
+                    <Label>Type</Label>
+                    <Select value={form.membership_type} onValueChange={(v) => setForm({ ...form, membership_type: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="player">Spiller</SelectItem>
+                        <SelectItem value="coach">Trener</SelectItem>
+                        <SelectItem value="volunteer">Frivillig</SelectItem>
+                        <SelectItem value="board_member">Styremedlem</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div>
+                  <Label>Lag/gruppe</Label>
+                  <Input placeholder="f.eks. Gutter 2012" value={form.team} onChange={(e) => setForm({ ...form, team: e.target.value })} />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>E-post</Label>
+                    <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+                  </div>
+                  <div>
+                    <Label>Telefon</Label>
+                    <Input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Foresatt navn</Label>
+                    <Input value={form.parent_name} onChange={(e) => setForm({ ...form, parent_name: e.target.value })} />
+                  </div>
+                  <div>
+                    <Label>Foresatt e-post</Label>
+                    <Input type="email" value={form.parent_email} onChange={(e) => setForm({ ...form, parent_email: e.target.value })} />
+                  </div>
+                </div>
+              </>
+            )}
             <DialogFooter>
               <Button type="button" variant="outline" onClick={resetForm}>Avbryt</Button>
               <Button type="submit">{editingMember ? 'Oppdater' : 'Legg til'}</Button>
