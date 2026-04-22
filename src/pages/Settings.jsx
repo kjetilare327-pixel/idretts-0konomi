@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Save, Building2, Mail, Trash2, AlertTriangle, Hash, Sun, Moon, Monitor } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,9 +21,12 @@ export default function Settings() {
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('parent');
 
+  const { user } = useAuth();
+
   const { data: clubs = [] } = useQuery({
-    queryKey: ['clubs'],
-    queryFn: () => base44.entities.Club.list('-created_date', 1),
+    queryKey: ['clubs', user?.email],
+    queryFn: () => base44.entities.Club.filter({ created_by: user.email }, '-created_date', 1),
+    enabled: !!user?.email,
   });
 
   const club = clubs[0];

@@ -29,9 +29,9 @@ const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, user } = useAuth();
 
   const { data: clubs = [], isLoading: isLoadingClubs } = useQuery({
-    queryKey: ['clubs'],
-    queryFn: () => base44.entities.Club.list('-created_date', 1),
-    enabled: !isLoadingAuth && !isLoadingPublicSettings && !authError,
+    queryKey: ['clubs', user?.email],
+    queryFn: () => base44.entities.Club.filter({ created_by: user.email }, '-created_date', 1),
+    enabled: !isLoadingAuth && !isLoadingPublicSettings && !authError && !!user?.email,
   });
 
   if (isLoadingPublicSettings || isLoadingAuth) {
