@@ -76,6 +76,7 @@ const AuthenticatedApp = () => {
 
   return (
     <Routes>
+      <Route path="/onboarding" element={<Onboarding />} />
       <Route element={<AppLayout />}>
         <Route path="/" element={<Dashboard />} />
         <Route path="/transactions" element={<Transactions />} />
