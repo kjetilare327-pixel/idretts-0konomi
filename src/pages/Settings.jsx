@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Save, Building2, Mail, Trash2, AlertTriangle, Hash, Sun, Moon, Monitor } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
+import SubscriptionCard from '@/components/settings/SubscriptionCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -168,6 +169,11 @@ export default function Settings() {
         </form>
         <p className="text-xs text-muted-foreground mt-2">Brukeren får en invitasjon på e-post og kan logge inn umiddelbart.</p>
       </div>
+
+      <Separator />
+
+      {/* Subscription */}
+      <SubscriptionCard club={club} />
 
       <Separator />
 
