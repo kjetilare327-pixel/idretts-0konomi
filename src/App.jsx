@@ -66,6 +66,7 @@ const AuthenticatedApp = () => {
   if (clubs.length === 0) {
     return (
       <Routes>
+        <Route path="/onboarding" element={<Onboarding />} />
         <Route path="*" element={<Onboarding />} />
       </Routes>
     );
