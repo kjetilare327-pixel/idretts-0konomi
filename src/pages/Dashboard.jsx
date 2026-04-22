@@ -7,6 +7,7 @@ import StatCard from '@/components/dashboard/StatCard';
 import QuickActions from '@/components/dashboard/QuickActions';
 import UnpaidWidget from '@/components/dashboard/UnpaidWidget';
 import IncomeExpenseChart from '@/components/dashboard/IncomeExpenseChart';
+import AiInsightsWidget from '@/components/dashboard/AiInsightsWidget';
 import { toast } from 'sonner';
 
 export default function Dashboard() {
@@ -55,11 +56,22 @@ export default function Dashboard() {
 
   const sendReminderMutation = useMutation({
     mutationFn: async (payment) => {
+      const daysOverdue = payment.due_date
+        ? Math.floor((Date.now() - new Date(payment.due_date).getTime()) / (1000 * 60 * 60 * 24))
+        : 0;
+      const remaining = payment.total_amount - (payment.amount_paid || 0);
+      let tone = 'vennlig og profesjonell';
+      if (daysOverdue > 14) tone = 'tydelig krav om betaling, men høflig';
+      else if (daysOverdue > 7) tone = 'bestemt og profesjonell';
+
       if (payment.parent_email) {
+        const aiRes = await base44.integrations.Core.InvokeLLM({
+          prompt: `Du er en profesjonell klubbadministrator. Skriv en kort betalingspåminnelse på norsk.\n\nKrav: ${payment.title}\nBeløp: kr ${remaining.toLocaleString('nb-NO')}\nForfallsdato: ${payment.due_date}\nDager siden forfall: ${daysOverdue > 0 ? daysOverdue : 'ikke forfalt ennå'}\nTone: ${tone}\n\nMaks 4 setninger. Avslutt med "Mvh, KlubbFinans". Ingen HTML.`,
+        });
         await base44.integrations.Core.SendEmail({
           to: payment.parent_email,
           subject: `Påminnelse: ${payment.title}`,
-          body: `Hei!\n\nDette er en påminnelse om ubetalt krav: ${payment.title}\nBeløp: kr ${(payment.total_amount - (payment.amount_paid || 0)).toLocaleString('nb-NO')}\nFrist: ${payment.due_date}\n\nVennligst betal snarest.\n\nMvh,\nKlubbFinans`,
+          body: aiRes,
         });
       }
       await base44.entities.PaymentRequirement.update(payment.id, {
@@ -96,11 +108,16 @@ export default function Dashboard() {
         <div className="lg:col-span-3">
           <IncomeExpenseChart transactions={ytdTransactions} />
         </div>
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 space-y-6">
           <UnpaidWidget
             payments={payments}
             onMarkPaid={(p) => markPaidMutation.mutate(p)}
             onSendReminder={(p) => sendReminderMutation.mutate(p)}
+          />
+          <AiInsightsWidget
+            totalIncome={totalIncome}
+            totalExpenses={totalExpenses}
+            unpaidTotal={unpaidTotal}
           />
         </div>
       </div>

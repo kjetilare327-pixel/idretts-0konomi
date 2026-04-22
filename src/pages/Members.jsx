@@ -91,11 +91,17 @@ export default function Members() {
     }
   };
 
-  const filtered = members.filter(m => {
-    if (!search) return true;
-    const s = search.toLowerCase();
-    return m.full_name?.toLowerCase().includes(s) || m.team?.toLowerCase().includes(s) || m.parent_email?.toLowerCase().includes(s);
-  });
+  const filtered = members
+    .filter(m => {
+      if (!search) return true;
+      const s = search.toLowerCase();
+      return m.full_name?.toLowerCase().includes(s) || m.team?.toLowerCase().includes(s) || m.parent_email?.toLowerCase().includes(s);
+    })
+    .sort((a, b) => {
+      const nameA = (a.full_name || '').trim();
+      const nameB = (b.full_name || '').trim();
+      return nameA.localeCompare(nameB, 'nb', { sensitivity: 'base' });
+    });
 
   const typeLabels = { player: 'Spiller', coach: 'Trener', volunteer: 'Frivillig', board_member: 'Styremedlem' };
 

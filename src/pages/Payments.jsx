@@ -10,6 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import { formatNOK, formatDate, STATUS_CONFIG, PAYMENT_CATEGORIES } from '@/lib/utils';
 import PaymentForm from '@/components/payments/PaymentForm';
 import RecordPaymentDialog from '@/components/payments/RecordPaymentDialog';
+import AiCostSplitter from '@/components/payments/AiCostSplitter';
 import { toast } from 'sonner';
 
 export default function Payments() {
@@ -69,11 +70,37 @@ export default function Payments() {
 
   const sendReminderMutation = useMutation({
     mutationFn: async (payment) => {
+      const daysOverdue = payment.due_date
+        ? Math.floor((Date.now() - new Date(payment.due_date).getTime()) / (1000 * 60 * 60 * 24))
+        : 0;
+      const remaining = payment.total_amount - (payment.amount_paid || 0);
+
+      let tone = 'vennlig og profesjonell';
+      if (daysOverdue > 14) tone = 'tydelig krav om betaling, men høflig';
+      else if (daysOverdue > 7) tone = 'bestemt og profesjonell';
+
+      let emailBody;
       if (payment.parent_email) {
+        const aiRes = await base44.integrations.Core.InvokeLLM({
+          prompt: `Du er en profesjonell klubbadministrator. Skriv en kort betalingspåminnelse på norsk.
+
+Variabler:
+- Krav: ${payment.title}
+- Beløp: kr ${remaining.toLocaleString('nb-NO')}
+- Forfallsdato: ${payment.due_date}
+- Dager siden forfall: ${daysOverdue > 0 ? daysOverdue : 'ikke forfalt ennå'}
+- Tone: ${tone}
+
+Regler:
+- Maks 4 setninger
+- Avslutt med "Mvh, KlubbFinans"
+- Ingen HTML, kun ren tekst`,
+        });
+        emailBody = aiRes;
         await base44.integrations.Core.SendEmail({
           to: payment.parent_email,
           subject: `Påminnelse: ${payment.title}`,
-          body: `Hei!\n\nDette er en påminnelse om ubetalt krav: ${payment.title}\nBeløp: kr ${(payment.total_amount - (payment.amount_paid || 0)).toLocaleString('nb-NO')}\nFrist: ${payment.due_date}\n\nVennligst betal snarest.\n\nMvh,\nKlubbFinans`,
+          body: emailBody,
         });
       }
       await base44.entities.PaymentRequirement.update(payment.id, {
@@ -113,6 +140,8 @@ export default function Payments() {
           onCancel={() => setShowForm(false)}
         />
       )}
+
+      <AiCostSplitter members={members} />
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
