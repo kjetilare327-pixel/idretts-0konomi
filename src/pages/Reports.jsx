@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { TrendingUp, TrendingDown } from 'lucide-react';
+import { TrendingUp, TrendingDown, Building2 } from 'lucide-react';
 import { formatNOK, CATEGORIES } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import ExportButtons from '@/components/reports/ExportButtons';
+import AccountingExportDialog from '@/components/reports/AccountingExportDialog';
 
 export default function Reports() {
+  const [showAccountingExport, setShowAccountingExport] = useState(false);
   const { data: transactions = [] } = useQuery({
     queryKey: ['transactions'],
     queryFn: () => base44.entities.Transaction.list('-date', 1000),
@@ -42,12 +45,18 @@ export default function Reports() {
 
   return (
     <div className="space-y-6">
+      <AccountingExportDialog open={showAccountingExport} onClose={() => setShowAccountingExport(false)} transactions={transactions} />
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">Rapporter</h1>
           <p className="text-sm text-muted-foreground mt-1">Resultatregnskap og eksport</p>
         </div>
-        <ExportButtons transactions={transactions} payments={payments} members={members} />
+        <div className="flex flex-wrap gap-2">
+          <Button variant="outline" onClick={() => setShowAccountingExport(true)}>
+            <Building2 className="w-4 h-4 mr-2" /> Eksporter til regnskapssystem
+          </Button>
+          <ExportButtons transactions={transactions} payments={payments} members={members} />
+        </div>
       </div>
 
       {/* Empty state */}
