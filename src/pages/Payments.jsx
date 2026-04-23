@@ -11,6 +11,7 @@ import { formatNOK, formatDate, STATUS_CONFIG, PAYMENT_CATEGORIES } from '@/lib/
 import PaymentForm from '@/components/payments/PaymentForm';
 import RecordPaymentDialog from '@/components/payments/RecordPaymentDialog';
 import AiCostSplitter from '@/components/payments/AiCostSplitter';
+import VippsPayButton from '@/components/payments/VippsPayButton';
 import { toast } from 'sonner';
 
 export default function Payments() {
@@ -187,8 +188,9 @@ export default function Payments() {
                         <Button size="sm" variant="outline" onClick={() => sendReminderMutation.mutate(p)} title="Send påminnelse">
                           <Send className="w-3.5 h-3.5" />
                         </Button>
+                        <VippsPayButton payment={p} size="sm" />
                         <Button size="sm" onClick={() => setRecordPayment(p)} title="Registrer betaling">
-                          <Check className="w-3.5 h-3.5 mr-1" /> Betal
+                          <Check className="w-3.5 h-3.5 mr-1" /> Manuell
                         </Button>
                       </>
                     )}

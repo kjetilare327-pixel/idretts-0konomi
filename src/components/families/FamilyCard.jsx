@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, Mail, Copy, ChevronDown, ChevronUp, CreditCard } from 'lucide-react';
+import { Users, Mail, Copy, ChevronDown, ChevronUp } from 'lucide-react';
 import { formatNOK } from '@/lib/utils';
+import VippsPayButton from '@/components/payments/VippsPayButton';
 import { toast } from 'sonner';
 
-export default function FamilyCard({ family, onPayAll, isPaying }) {
+export default function FamilyCard({ family }) {
   const [expanded, setExpanded] = useState(false);
 
   const inviteLink = `${window.location.origin}/onboarding?family=${encodeURIComponent(family.parentEmail)}`;
@@ -58,10 +59,16 @@ export default function FamilyCard({ family, onPayAll, isPaying }) {
 
         <div className="flex items-center gap-2 flex-shrink-0">
           {family.totalOwed > 0 && (
-            <Button size="sm" onClick={onPayAll} disabled={isPaying}>
-              <CreditCard className="w-3.5 h-3.5 mr-1.5" />
-              Betal alle
-            </Button>
+            <VippsPayButton
+              payment={{
+                id: family.unpaidPayments[0]?.id,
+                title: `Familie ${family.familyName} – alle krav`,
+                total_amount: family.totalOwed,
+                amount_paid: 0,
+                status: 'pending',
+              }}
+              size="sm"
+            />
           )}
           <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => setExpanded(e => !e)}>
             {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}

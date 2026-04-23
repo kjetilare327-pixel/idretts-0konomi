@@ -1,17 +1,16 @@
 import React, { useState, useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { Search, Users, Sparkles, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
+
 import FamilyCard from '@/components/families/FamilyCard';
 import { formatNOK } from '@/lib/utils';
 
 export default function Families() {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [aiInsight, setAiInsight] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
@@ -31,23 +30,6 @@ export default function Families() {
   const { data: payments = [] } = useQuery({
     queryKey: ['payments'],
     queryFn: () => base44.entities.PaymentRequirement.list('-created_date', 500),
-  });
-
-  const markPaidMutation = useMutation({
-    mutationFn: async (paymentIds) => {
-      for (const pid of paymentIds) {
-        const p = payments.find(x => x.id === pid);
-        if (!p || p.status === 'paid') continue;
-        await base44.entities.PaymentRequirement.update(pid, {
-          amount_paid: p.total_amount,
-          status: 'paid',
-        });
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payments'] });
-      toast.success('Alle familiebetalinger er markert som betalt');
-    },
   });
 
   // Group members by parent_email → families
@@ -186,8 +168,6 @@ export default function Families() {
             <FamilyCard
               key={family.parentEmail}
               family={family}
-              onPayAll={() => markPaidMutation.mutate(family.unpaidPayments.map(p => p.id))}
-              isPaying={markPaidMutation.isPending}
             />
           ))}
         </div>
