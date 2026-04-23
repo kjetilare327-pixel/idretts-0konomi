@@ -22,6 +22,7 @@ const PAGE_TITLES = {
   '/settings': 'Innstillinger',
   '/ai-assistant': 'AI Assistent',
   '/bank-integration': 'Bank-integrasjon',
+  '/recurring-payments': 'Automatisk kontingent',
 };
 
 export default function AppLayout() {

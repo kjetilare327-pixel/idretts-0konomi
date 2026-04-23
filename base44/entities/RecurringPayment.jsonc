@@ -1,0 +1,79 @@
+{
+  "name": "RecurringPayment",
+  "type": "object",
+  "properties": {
+    "club_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "description": "e.g. Medlemskontingent 2025"
+    },
+    "description": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "membership_fees",
+        "training_fees",
+        "equipment",
+        "tournaments",
+        "travel",
+        "other"
+      ]
+    },
+    "frequency": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "quarterly",
+        "biannual",
+        "annual"
+      ],
+      "description": "M\u00e5nedlig / Kvartalsvis / Halv\u00e5rlig / \u00c5rlig"
+    },
+    "next_due_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "member_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Which members this applies to"
+    },
+    "team_filter": {
+      "type": "string",
+      "description": "Optional team filter label"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "paused",
+        "ended"
+      ],
+      "default": "active"
+    },
+    "last_run_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "reminder_sent": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "club_id",
+    "title",
+    "amount",
+    "frequency",
+    "next_due_date"
+  ]
+}
