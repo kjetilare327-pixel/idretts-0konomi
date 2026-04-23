@@ -25,11 +25,12 @@ import Liquidity from '@/pages/Liquidity';
 import BankIntegration from '@/pages/BankIntegration';
 import RecurringPayments from '@/pages/RecurringPayments';
 import Families from '@/pages/Families';
+import Consent from '@/pages/Consent';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, user } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, user, checkUserAuth } = useAuth();
 
   const { data: clubs = [], isLoading: isLoadingClubs } = useQuery({
     queryKey: ['clubs', user?.email],
@@ -65,6 +66,11 @@ const AuthenticatedApp = () => {
         <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin"></div>
       </div>
     );
+  }
+
+  // User hasn't given consent yet → show consent page
+  if (user && !user.consent_given) {
+    return <Consent onConsented={checkUserAuth} />;
   }
 
   // No club yet → show onboarding
