@@ -22,6 +22,7 @@ import Onboarding from '@/pages/Onboarding';
 import AiAssistant from '@/pages/AiAssistant';
 import Automation from '@/pages/Automation';
 import Liquidity from '@/pages/Liquidity';
+import BankIntegration from '@/pages/BankIntegration';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 
@@ -91,6 +92,7 @@ const AuthenticatedApp = () => {
         <Route path="/ai-assistant" element={<AiAssistant />} />
         <Route path="/automation" element={<Automation />} />
         <Route path="/liquidity" element={<Liquidity />} />
+        <Route path="/bank-integration" element={<BankIntegration />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

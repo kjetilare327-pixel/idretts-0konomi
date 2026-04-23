@@ -21,6 +21,7 @@ const PAGE_TITLES = {
   '/audit-log': 'Revisjonslogg',
   '/settings': 'Innstillinger',
   '/ai-assistant': 'AI Assistent',
+  '/bank-integration': 'Bank-integrasjon',
 };
 
 export default function AppLayout() {

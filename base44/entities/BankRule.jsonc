@@ -1,0 +1,37 @@
+{
+  "name": "BankRule",
+  "type": "object",
+  "properties": {
+    "club_id": {
+      "type": "string"
+    },
+    "keyword": {
+      "type": "string",
+      "description": "Match keyword in description"
+    },
+    "category": {
+      "type": "string"
+    },
+    "transaction_type": {
+      "type": "string",
+      "enum": [
+        "income",
+        "expense"
+      ],
+      "default": "income"
+    },
+    "description": {
+      "type": "string"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "club_id",
+    "keyword",
+    "category",
+    "transaction_type"
+  ]
+}

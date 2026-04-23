@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, ArrowLeftRight, CreditCard,
   Users, FileText, Settings, X, ChevronLeft,
-  Bot, Bell, BarChart3
+  Bot, Bell, BarChart3, Building2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -16,6 +16,7 @@ const navItems = [
   { path: '/liquidity', label: 'Likviditet', icon: BarChart3 },
   { path: '/automation', label: 'Automatisering', icon: Bell },
   { path: '/ai-assistant', label: 'AI Assistent', icon: Bot },
+  { path: '/bank-integration', label: 'Bank-integrasjon', icon: Building2 },
   { path: '/settings', label: 'Innstillinger', icon: Settings },
 ];
 

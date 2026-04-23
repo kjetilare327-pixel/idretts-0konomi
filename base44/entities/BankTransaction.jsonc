@@ -1,0 +1,51 @@
+{
+  "name": "BankTransaction",
+  "type": "object",
+  "properties": {
+    "club_id": {
+      "type": "string"
+    },
+    "bank_connection_id": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "amount": {
+      "type": "number"
+    },
+    "description": {
+      "type": "string"
+    },
+    "reference": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "matched",
+        "unmatched",
+        "ignored"
+      ],
+      "default": "unmatched"
+    },
+    "matched_transaction_id": {
+      "type": "string"
+    },
+    "matched_payment_id": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "member_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "club_id",
+    "date",
+    "amount"
+  ]
+}

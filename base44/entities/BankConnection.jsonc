@@ -1,0 +1,43 @@
+{
+  "name": "BankConnection",
+  "type": "object",
+  "properties": {
+    "club_id": {
+      "type": "string"
+    },
+    "bank_name": {
+      "type": "string"
+    },
+    "account_number": {
+      "type": "string"
+    },
+    "account_name": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "connected",
+        "disconnected",
+        "error"
+      ],
+      "default": "connected"
+    },
+    "last_synced": {
+      "type": "string",
+      "format": "date"
+    },
+    "connection_method": {
+      "type": "string",
+      "enum": [
+        "bankid",
+        "api_key"
+      ],
+      "default": "bankid"
+    }
+  },
+  "required": [
+    "club_id",
+    "bank_name"
+  ]
+}
