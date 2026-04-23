@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { Bell, CheckCircle, Clock, RefreshCw, Zap } from 'lucide-react';
+import { Bell, CheckCircle, Clock, RefreshCw, Zap, Mail, Send } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -31,12 +31,14 @@ export default function Automation() {
   const [enabled, setEnabled] = useState(false);
   const [firstDays, setFirstDays] = useState('7');
   const [repeatDays, setRepeatDays] = useState('7');
+  const [emailEnabled, setEmailEnabled] = useState(true);
 
   useEffect(() => {
     if (settings) {
       setEnabled(settings.auto_reminder_enabled || false);
       setFirstDays(String(settings.first_reminder_days || 7));
       setRepeatDays(String(settings.repeat_reminder_days || 7));
+      setEmailEnabled(settings.email_reminders_enabled !== false);
     }
   }, [settings]);
 
@@ -94,11 +96,20 @@ export default function Automation() {
     },
   });
 
+  const sendEmailsMutation = useMutation({
+    mutationFn: () => base44.functions.invoke('sendOverdueReminders', {}),
+    onSuccess: (res) => {
+      toast.success(`${res.data?.sent ?? 0} e-postpåminnelser sendt`);
+    },
+    onError: () => toast.error('Feil ved sending av e-poster'),
+  });
+
   const handleSave = () => {
     saveMutation.mutate({
       auto_reminder_enabled: enabled,
       first_reminder_days: parseInt(firstDays),
       repeat_reminder_days: parseInt(repeatDays),
+      email_reminders_enabled: emailEnabled,
     });
   };
 
@@ -159,6 +170,14 @@ export default function Automation() {
           </Select>
         </div>
 
+        <div className="flex items-center justify-between py-3 border-t border-border">
+          <div>
+            <Label className="text-sm font-medium">Send e-post til foresatte</Label>
+            <p className="text-xs text-muted-foreground mt-0.5">Sender faktisk e-post til foresatt/member ved automatisk purring</p>
+          </div>
+          <Switch checked={emailEnabled} onCheckedChange={setEmailEnabled} />
+        </div>
+
         <Button onClick={handleSave} disabled={saveMutation.isPending}>
           Lagre innstillinger
         </Button>
@@ -174,14 +193,26 @@ export default function Automation() {
           Det er <span className="font-semibold text-foreground">{overdueCount}</span> forfalte ubetalte krav.
           Klikk for å registrere purringer på alle som kvalifiserer basert på innstillingene over.
         </p>
-        <Button
-          variant="outline"
-          onClick={() => runRemindersMutation.mutate()}
-          disabled={runRemindersMutation.isPending || overdueCount === 0}
-        >
-          <Bell className="w-4 h-4 mr-2" />
-          {runRemindersMutation.isPending ? 'Kjører...' : 'Kjør purringer nå'}
-        </Button>
+        <div className="flex flex-wrap gap-3">
+          <Button
+            variant="outline"
+            onClick={() => runRemindersMutation.mutate()}
+            disabled={runRemindersMutation.isPending || overdueCount === 0}
+          >
+            <Bell className="w-4 h-4 mr-2" />
+            {runRemindersMutation.isPending ? 'Kjører...' : 'Registrer purringer'}
+          </Button>
+          <Button
+            onClick={() => sendEmailsMutation.mutate()}
+            disabled={sendEmailsMutation.isPending || overdueCount === 0}
+          >
+            <Mail className="w-4 h-4 mr-2" />
+            {sendEmailsMutation.isPending ? 'Sender...' : 'Send e-postpåminnelser nå'}
+          </Button>
+        </div>
+        <p className="text-xs text-muted-foreground mt-3">
+          E-poster sendes til foresatt/e-post knyttet til hvert betalingskrav. Kun krav som kvalifiserer basert på innstillingene over vil motta purring.
+        </p>
       </div>
 
       {/* Recent reminders */}

@@ -18,6 +18,11 @@
       "type": "number",
       "default": 7,
       "description": "Days between subsequent reminders"
+    },
+    "email_reminders_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether to actually send email notifications"
     }
   },
   "required": [
