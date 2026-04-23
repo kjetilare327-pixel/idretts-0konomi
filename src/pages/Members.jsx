@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import MemberBalanceBadge from '@/components/members/MemberBalanceBadge';
+import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
 export default function Members() {
@@ -112,9 +113,16 @@ export default function Members() {
           <h1 className="text-2xl font-bold">Medlemmer</h1>
           <p className="text-sm text-muted-foreground mt-1">{members.length} registrerte medlemmer</p>
         </div>
-        <Button onClick={() => setShowForm(true)}>
-          <Plus className="w-4 h-4 mr-2" /> Nytt medlem
-        </Button>
+        <div className="flex gap-2">
+          <Link to="/families">
+            <Button variant="outline">
+              <Users className="w-4 h-4 mr-2" /> Familieoversikt
+            </Button>
+          </Link>
+          <Button onClick={() => setShowForm(true)}>
+            <Plus className="w-4 h-4 mr-2" /> Nytt medlem
+          </Button>
+        </div>
       </div>
 
       {/* Search */}

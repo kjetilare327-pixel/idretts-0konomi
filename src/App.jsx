@@ -24,6 +24,7 @@ import Automation from '@/pages/Automation';
 import Liquidity from '@/pages/Liquidity';
 import BankIntegration from '@/pages/BankIntegration';
 import RecurringPayments from '@/pages/RecurringPayments';
+import Families from '@/pages/Families';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 
@@ -95,6 +96,7 @@ const AuthenticatedApp = () => {
         <Route path="/liquidity" element={<Liquidity />} />
         <Route path="/bank-integration" element={<BankIntegration />} />
         <Route path="/recurring-payments" element={<RecurringPayments />} />
+        <Route path="/families" element={<Families />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
