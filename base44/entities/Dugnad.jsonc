@@ -1,0 +1,64 @@
+{
+  "name": "Dugnad",
+  "type": "object",
+  "properties": {
+    "club_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string",
+      "description": "Navn p\u00e5 dugnaden"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "time": {
+      "type": "string",
+      "description": "Tidspunkt, f.eks. 10:00"
+    },
+    "location": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "estimated_income": {
+      "type": "number",
+      "default": 0
+    },
+    "actual_income": {
+      "type": "number",
+      "default": 0
+    },
+    "hours": {
+      "type": "number"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "ongoing",
+        "completed",
+        "cancelled"
+      ],
+      "default": "planned"
+    },
+    "participant_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Member IDs"
+    },
+    "income_distributed": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "club_id",
+    "name",
+    "date"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "name": "DugnadParticipant",
+  "type": "object",
+  "properties": {
+    "dugnad_id": {
+      "type": "string"
+    },
+    "member_id": {
+      "type": "string"
+    },
+    "club_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "registered",
+        "attended",
+        "absent",
+        "exempt"
+      ],
+      "default": "registered"
+    },
+    "income_share": {
+      "type": "number",
+      "default": 0,
+      "description": "NOK credited to this member"
+    },
+    "hours_worked": {
+      "type": "number",
+      "default": 0
+    },
+    "note": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "dugnad_id",
+    "member_id",
+    "club_id"
+  ]
+}

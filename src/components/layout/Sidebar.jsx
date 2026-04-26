@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, ArrowLeftRight, CreditCard,
   Users, FileText, Settings, X, ChevronLeft,
-  Bot, Bell, Building2, CalendarClock, PieChart
+  Bot, Bell, Building2, CalendarClock, PieChart, Handshake
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -12,6 +12,7 @@ const navItems = [
   { path: '/transactions', label: 'Transaksjoner', icon: ArrowLeftRight },
   { path: '/payments', label: 'Betalinger', icon: CreditCard },
   { path: '/recurring-payments', label: 'Automatisk kontingent', icon: CalendarClock },
+  { path: '/dugnad', label: 'Dugnad', icon: Handshake },
   { path: '/members', label: 'Medlemmer', icon: Users },
   { path: '/reports', label: 'Rapporter', icon: FileText },
   { path: '/season-budget', label: 'Sesongbudsjett', icon: PieChart },

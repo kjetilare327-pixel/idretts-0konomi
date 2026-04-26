@@ -25,6 +25,7 @@ import Liquidity from '@/pages/Liquidity';
 import BankIntegration from '@/pages/BankIntegration';
 import RecurringPayments from '@/pages/RecurringPayments';
 import Families from '@/pages/Families';
+import Dugnad from '@/pages/Dugnad';
 import Consent from '@/pages/Consent';
 import PlayerBalance from '@/pages/PlayerBalance';
 import SeasonBudget from '@/pages/SeasonBudget';
@@ -104,6 +105,7 @@ const AuthenticatedApp = () => {
         <Route path="/bank-integration" element={<BankIntegration />} />
         <Route path="/recurring-payments" element={<RecurringPayments />} />
         <Route path="/families" element={<Families />} />
+        <Route path="/dugnad" element={<Dugnad />} />
         <Route path="/player-balance" element={<PlayerBalance />} />
         <Route path="/season-budget" element={<SeasonBudget />} />
       </Route>

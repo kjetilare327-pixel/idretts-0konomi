@@ -1,202 +1,190 @@
-import React, { useState } from 'react';
-import { Calculator, Plus, Trash2, TrendingUp, Info } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { Plus, Handshake, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { formatNOK } from '@/lib/utils';
-
-const TEMPLATES = [
-  { label: 'Loddsalg', description: 'Lodd à kr', unit: 'lodd', unitPrice: 50, quantity: 500 },
-  { label: 'Bingo', description: 'Spillere à kr', unit: 'spillere', unitPrice: 100, quantity: 50 },
-  { label: 'Basar', description: 'Billetter à kr', unit: 'billetter', unitPrice: 100, quantity: 200 },
-  { label: 'Vaffelsal', description: 'Vafler à kr', unit: 'vafler', unitPrice: 30, quantity: 100 },
-  { label: 'Kakesalg', description: 'Kaker à kr', unit: 'kaker', unitPrice: 150, quantity: 30 },
-];
-
-function parseLine(line) {
-  // Parse "1000 lodd à 50 kr" or similar
-  const match = line.match(/(\d+)\s+\w+\s+à\s+(\d+)/i);
-  if (match) return parseInt(match[1]) * parseInt(match[2]);
-  // Parse "50 * 1000" or "1000 * 50"
-  const mul = line.match(/(\d+)\s*[x*×]\s*(\d+)/i);
-  if (mul) return parseInt(mul[1]) * parseInt(mul[2]);
-  return null;
-}
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import DugnadForm from '@/components/dugnad/DugnadForm';
+import DugnadCard from '@/components/dugnad/DugnadCard';
+import DugnadDetail from '@/components/dugnad/DugnadDetail';
+import { toast } from 'sonner';
 
 export default function Dugnad() {
-  const [activities, setActivities] = useState([
-    { id: 1, name: 'Loddsalg', quantity: 1000, unitPrice: 50, cost: 200, description: '' },
-  ]);
-  const [quickInput, setQuickInput] = useState('');
-  const [quickResult, setQuickResult] = useState(null);
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const [showForm, setShowForm] = useState(false);
+  const [selectedDugnad, setSelectedDugnad] = useState(null);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
 
-  const addActivity = () => {
-    setActivities(prev => [...prev, {
-      id: Date.now(), name: 'Ny aktivitet', quantity: 100, unitPrice: 50, cost: 0, description: ''
-    }]);
-  };
+  const { data: clubs = [] } = useQuery({
+    queryKey: ['clubs', user?.email],
+    queryFn: () => base44.entities.Club.filter({ created_by: user.email }, '-created_date', 1),
+    enabled: !!user?.email,
+  });
+  const club = clubs[0];
 
-  const removeActivity = (id) => setActivities(prev => prev.filter(a => a.id !== id));
+  const { data: dugnader = [], isLoading } = useQuery({
+    queryKey: ['dugnader', club?.id],
+    queryFn: () => base44.entities.Dugnad.filter({ club_id: club.id }, '-date', 100),
+    enabled: !!club?.id,
+  });
 
-  const updateActivity = (id, field, value) => {
-    setActivities(prev => prev.map(a => a.id === id ? { ...a, [field]: value } : a));
-  };
+  const { data: members = [] } = useQuery({
+    queryKey: ['members'],
+    queryFn: () => base44.entities.Member.list('-created_date', 500),
+  });
 
-  const applyTemplate = (tpl) => {
-    setActivities(prev => [...prev, {
-      id: Date.now(), name: tpl.label, quantity: tpl.quantity, unitPrice: tpl.unitPrice, cost: 0, description: tpl.description
-    }]);
-  };
+  const { data: allParticipants = [] } = useQuery({
+    queryKey: ['all-dugnad-participants', club?.id],
+    queryFn: () => base44.entities.DugnadParticipant.filter({ club_id: club.id }),
+    enabled: !!club?.id,
+  });
 
-  const handleQuickInput = (val) => {
-    setQuickInput(val);
-    const result = parseLine(val);
-    setQuickResult(result);
-  };
+  const createMutation = useMutation({
+    mutationFn: (data) => base44.entities.Dugnad.create({ ...data, club_id: club.id, participant_ids: [] }),
+    onSuccess: (newDugnad) => {
+      queryClient.invalidateQueries({ queryKey: ['dugnader'] });
+      setShowForm(false);
+      toast.success('Dugnad opprettet!');
+      setSelectedDugnad(newDugnad);
+    },
+  });
 
-  const totalRevenue = activities.reduce((s, a) => s + (a.quantity * a.unitPrice), 0);
-  const totalCost = activities.reduce((s, a) => s + Number(a.cost || 0), 0);
-  const netResult = totalRevenue - totalCost;
+  const participantCountMap = useMemo(() => {
+    const map = {};
+    allParticipants.forEach(p => {
+      map[p.dugnad_id] = (map[p.dugnad_id] || 0) + 1;
+    });
+    return map;
+  }, [allParticipants]);
+
+  // If viewing detail
+  if (selectedDugnad) {
+    const fresh = dugnader.find(d => d.id === selectedDugnad.id) || selectedDugnad;
+    return (
+      <DugnadDetail
+        dugnad={fresh}
+        members={members}
+        club={club}
+        onBack={() => setSelectedDugnad(null)}
+      />
+    );
+  }
+
+  const filtered = dugnader.filter(d => {
+    const matchSearch = !search || d.name?.toLowerCase().includes(search.toLowerCase()) || d.location?.toLowerCase().includes(search.toLowerCase());
+    const matchStatus = statusFilter === 'all' || d.status === statusFilter;
+    return matchSearch && matchStatus;
+  });
+
+  const totalIncome = dugnader.reduce((s, d) => s + (d.actual_income || 0), 0);
+  const completedCount = dugnader.filter(d => d.status === 'completed').length;
+  const plannedCount = dugnader.filter(d => d.status === 'planned').length;
 
   return (
-    <div className="space-y-6 max-w-3xl">
-      <div>
-        <h1 className="text-2xl font-bold">Dugnads-kalkulator</h1>
-        <p className="text-sm text-muted-foreground mt-1">Beregn inntekter fra dugnad og se budsjetteffekt</p>
-      </div>
-
-      {/* Quick calculator */}
-      <div className="bg-card rounded-xl border border-border p-5">
-        <div className="flex items-center gap-2 mb-3">
-          <Calculator className="w-4 h-4 text-muted-foreground" />
-          <h3 className="font-semibold text-sm">Hurtigkalkulator</h3>
-          <span className="text-xs text-muted-foreground">Skriv f.eks. "1000 lodd à 50 kr"</span>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold">Dugnad</h1>
+          <p className="text-sm text-muted-foreground mt-1">Organiser og følg opp dugnader for klubben</p>
         </div>
-        <div className="flex gap-3 items-end">
-          <div className="flex-1">
-            <Input
-              placeholder='f.eks. "500 lodd à 50 kr" eller "200 × 30"'
-              value={quickInput}
-              onChange={(e) => handleQuickInput(e.target.value)}
-            />
-          </div>
-          {quickResult !== null && (
-            <div className="flex items-center gap-2 px-4 py-2 bg-green-50 text-green-700 rounded-lg border border-green-200 whitespace-nowrap font-bold">
-              = {formatNOK(quickResult)}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Templates */}
-      <div>
-        <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Legg til aktivitet fra mal</p>
-        <div className="flex flex-wrap gap-2">
-          {TEMPLATES.map((tpl) => (
-            <button
-              key={tpl.label}
-              onClick={() => applyTemplate(tpl)}
-              className="px-3 py-1.5 text-sm border border-dashed border-border rounded-lg hover:bg-muted hover:border-primary transition-colors"
-            >
-              + {tpl.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Activities */}
-      <div className="space-y-3">
-        {activities.map((a) => {
-          const revenue = a.quantity * a.unitPrice;
-          const net = revenue - Number(a.cost || 0);
-          return (
-            <div key={a.id} className="bg-card rounded-xl border border-border p-4">
-              <div className="flex items-start gap-3">
-                <div className="flex-1 grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <div className="col-span-2 sm:col-span-1">
-                    <Label className="text-xs">Aktivitet</Label>
-                    <Input
-                      value={a.name}
-                      onChange={(e) => updateActivity(a.id, 'name', e.target.value)}
-                      className="h-8 text-sm mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs">Antall</Label>
-                    <Input
-                      type="number" min="0"
-                      value={a.quantity}
-                      onChange={(e) => updateActivity(a.id, 'quantity', parseInt(e.target.value) || 0)}
-                      className="h-8 text-sm mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs">Pris per stk (kr)</Label>
-                    <Input
-                      type="number" min="0"
-                      value={a.unitPrice}
-                      onChange={(e) => updateActivity(a.id, 'unitPrice', parseInt(e.target.value) || 0)}
-                      className="h-8 text-sm mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-xs">Kostnader (kr)</Label>
-                    <Input
-                      type="number" min="0"
-                      value={a.cost}
-                      onChange={(e) => updateActivity(a.id, 'cost', e.target.value)}
-                      className="h-8 text-sm mt-1"
-                    />
-                  </div>
-                </div>
-                <button
-                  onClick={() => removeActivity(a.id)}
-                  className="text-muted-foreground hover:text-destructive mt-6 p-1"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="flex items-center gap-3 mt-3 pt-3 border-t border-border">
-                <span className="text-xs text-muted-foreground">Bruttoinntekt: <strong>{formatNOK(revenue)}</strong></span>
-                <span className="text-xs text-muted-foreground">Netto: <strong className={net >= 0 ? 'text-green-600' : 'text-red-600'}>{formatNOK(net)}</strong></span>
-              </div>
-            </div>
-          );
-        })}
-        <Button variant="outline" onClick={addActivity} className="w-full">
-          <Plus className="w-4 h-4 mr-2" /> Legg til aktivitet
+        <Button onClick={() => setShowForm(true)}>
+          <Plus className="w-4 h-4 mr-2" /> Ny dugnad
         </Button>
       </div>
 
       {/* Summary */}
-      <div className="bg-primary/5 border border-primary/20 rounded-xl p-5">
-        <div className="flex items-center gap-2 mb-4">
-          <TrendingUp className="w-4 h-4 text-primary" />
-          <h3 className="font-semibold">Budsjetteffekt</h3>
-        </div>
+      {dugnader.length > 0 && (
         <div className="grid grid-cols-3 gap-4">
-          <div>
-            <p className="text-xs text-muted-foreground">Totale inntekter</p>
-            <p className="text-lg font-bold text-green-600">{formatNOK(totalRevenue)}</p>
+          <div className="bg-card rounded-2xl border border-border p-4 text-center">
+            <p className="text-xs text-muted-foreground">Totalt inntjent</p>
+            <p className="text-xl font-bold mt-1 text-accent">
+              {totalIncome.toLocaleString('nb-NO')} kr
+            </p>
           </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Totale kostnader</p>
-            <p className="text-lg font-bold text-red-600">{formatNOK(totalCost)}</p>
+          <div className="bg-card rounded-2xl border border-border p-4 text-center">
+            <p className="text-xs text-muted-foreground">Fullført</p>
+            <p className="text-xl font-bold mt-1 text-green-600">{completedCount}</p>
           </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Netto bidrag</p>
-            <p className={`text-lg font-bold ${netResult >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatNOK(netResult)}</p>
+          <div className="bg-card rounded-2xl border border-border p-4 text-center">
+            <p className="text-xs text-muted-foreground">Planlagt</p>
+            <p className="text-xl font-bold mt-1 text-blue-600">{plannedCount}</p>
           </div>
         </div>
-        <div className="mt-3 p-3 bg-background rounded-lg border border-border flex items-start gap-2">
-          <Info className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-          <p className="text-xs text-muted-foreground">
-            Dette er et planleggingsverktøy — tallene påvirker ikke regnskapet automatisk. 
-            Registrer faktiske inntekter under <strong>Transaksjoner</strong> når dugnaden er gjennomført.
-          </p>
+      )}
+
+      {/* New dugnad form */}
+      {showForm && (
+        <DugnadForm
+          onSubmit={(data) => createMutation.mutate(data)}
+          onCancel={() => setShowForm(false)}
+          isPending={createMutation.isPending}
+        />
+      )}
+
+      {/* Filters */}
+      {dugnader.length > 0 && (
+        <div className="flex gap-3 flex-wrap">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Søk etter dugnad..."
+              className="pl-9"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Alle statuser</SelectItem>
+              <SelectItem value="planned">Planlagt</SelectItem>
+              <SelectItem value="ongoing">Pågår</SelectItem>
+              <SelectItem value="completed">Fullført</SelectItem>
+              <SelectItem value="cancelled">Avlyst</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
-      </div>
+      )}
+
+      {/* List */}
+      {isLoading ? (
+        <div className="p-12 text-center text-muted-foreground">Laster...</div>
+      ) : dugnader.length === 0 ? (
+        <div className="bg-card rounded-2xl border border-border flex flex-col items-center py-16 px-6 text-center gap-4">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <Handshake className="w-8 h-8 text-primary" />
+          </div>
+          <div>
+            <p className="text-base font-semibold">Ingen dugnader ennå</p>
+            <p className="text-sm text-muted-foreground mt-1 max-w-xs">
+              Dugnad er en av de viktigste inntektskildene for norske idrettslag. Opprett din første!
+            </p>
+          </div>
+          <Button size="lg" onClick={() => setShowForm(true)}>
+            <Plus className="w-4 h-4 mr-2" /> Opprett første dugnad
+          </Button>
+        </div>
+      ) : filtered.length === 0 ? (
+        <div className="bg-card rounded-2xl border border-border p-12 text-center text-muted-foreground">
+          Ingen dugnader funnet
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filtered.map(d => (
+            <DugnadCard
+              key={d.id}
+              dugnad={d}
+              participantCount={participantCountMap[d.id] || 0}
+              onOpen={() => setSelectedDugnad(d)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
