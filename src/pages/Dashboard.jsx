@@ -12,6 +12,7 @@ import AiInsightsWidget from '@/components/dashboard/AiInsightsWidget';
 import RecentActivity from '@/components/dashboard/RecentActivity';
 import TeamFilter from '@/components/dashboard/TeamFilter';
 import ProblemBox from '@/components/dashboard/ProblemBox';
+import ExpensePieChart from '@/components/dashboard/ExpensePieChart';
 import { toast } from 'sonner';
 
 export default function Dashboard() {
@@ -157,6 +158,7 @@ export default function Dashboard() {
       <div className="grid lg:grid-cols-5 gap-6">
         <div className="lg:col-span-3 space-y-6">
           <IncomeExpenseChart transactions={ytdTransactions} />
+          <ExpensePieChart transactions={ytdTransactions} />
           <RecentActivity transactions={filteredTransactions.slice(0, 5)} />
         </div>
         <div className="lg:col-span-2 space-y-6">
