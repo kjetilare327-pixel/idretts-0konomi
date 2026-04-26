@@ -24,11 +24,8 @@ export default function TopBar({ onMenuClick, user, pageTitle, canGoBack, onBack
           </Button>
         )}
 
-        {/* Mobile: show page title; Desktop: show welcome message */}
         <span className="text-base font-semibold text-foreground lg:hidden">{pageTitle}</span>
-        <span className="text-lg font-semibold text-foreground hidden lg:block">
-          Velkommen tilbake{user?.full_name ? `, ${user.full_name.split(' ')[0]}` : ''}
-        </span>
+        <span className="text-lg font-semibold text-foreground hidden lg:block">{pageTitle}</span>
       </div>
 
       <div className="flex items-center gap-1">
