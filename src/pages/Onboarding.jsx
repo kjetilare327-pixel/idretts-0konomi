@@ -27,36 +27,43 @@ export default function Onboarding() {
   const handleCreate = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const trialEnd = new Date();
-    trialEnd.setDate(trialEnd.getDate() + 21);
-    const club = await base44.entities.Club.create({
-      name: clubName,
-      join_code: generateJoinCode(),
-      subscription_status: 'trial',
-      trial_ends_at: trialEnd.toISOString().split('T')[0],
-    });
-    await base44.auth.updateMe({ role: 'admin', club_id: club.id });
-    queryClient.invalidateQueries({ queryKey: ['clubs'] });
-    queryClient.invalidateQueries({ queryKey: ['me'] });
-    toast.success(`Laget "${clubName}" er opprettet!`);
-    navigate('/');
+    try {
+      const trialEnd = new Date();
+      trialEnd.setDate(trialEnd.getDate() + 21);
+      const club = await base44.entities.Club.create({
+        name: clubName,
+        join_code: generateJoinCode(),
+        subscription_status: 'trial',
+        trial_ends_at: trialEnd.toISOString().split('T')[0],
+      });
+      await base44.auth.updateMe({ role: 'admin', club_id: club.id });
+      toast.success(`Laget "${clubName}" er opprettet!`);
+      // Full reload so App.jsx re-fetches clubs fresh
+      window.location.href = '/';
+    } catch (err) {
+      toast.error('Noe gikk galt. Prøv igjen.');
+      setLoading(false);
+    }
   };
 
   const handleJoin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const clubs = await base44.entities.Club.filter({ join_code: joinCode.trim() });
-    if (!clubs || clubs.length === 0) {
-      toast.error('Ugyldig kode. Sjekk at du har skrevet riktig.');
+    try {
+      const clubs = await base44.entities.Club.filter({ join_code: joinCode.trim() });
+      if (!clubs || clubs.length === 0) {
+        toast.error('Ugyldig kode. Sjekk at du har skrevet riktig.');
+        setLoading(false);
+        return;
+      }
+      const club = clubs[0];
+      await base44.auth.updateMe({ role: 'user', club_id: club.id });
+      toast.success(`Du er nå med i "${club.name}"!`);
+      window.location.href = '/';
+    } catch (err) {
+      toast.error('Noe gikk galt. Prøv igjen.');
       setLoading(false);
-      return;
     }
-    const club = clubs[0];
-    await base44.auth.updateMe({ role: 'user', club_id: club.id });
-    queryClient.invalidateQueries({ queryKey: ['clubs'] });
-    queryClient.invalidateQueries({ queryKey: ['me'] });
-    toast.success(`Du er nå med i "${club.name}"!`);
-    navigate('/');
   };
 
   return (
