@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Plus, Users, Search, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Users, Search, Edit2, Trash2, Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,9 +11,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import MemberBalanceBadge from '@/components/members/MemberBalanceBadge';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import PlayerBalance from '@/pages/PlayerBalance';
 
 export default function Members() {
   const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState('members');
   const [showForm, setShowForm] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
   const [search, setSearch] = useState('');
@@ -119,12 +121,35 @@ export default function Members() {
               <Users className="w-4 h-4 mr-2" /> Familieoversikt
             </Button>
           </Link>
-          <Button onClick={() => setShowForm(true)}>
-            <Plus className="w-4 h-4 mr-2" /> Nytt medlem
-          </Button>
+          {activeTab === 'members' && (
+            <Button onClick={() => setShowForm(true)}>
+              <Plus className="w-4 h-4 mr-2" /> Nytt medlem
+            </Button>
+          )}
         </div>
       </div>
 
+      {/* Tabs */}
+      <div className="flex gap-1 bg-muted/50 p-1 rounded-xl w-fit">
+        <button
+          onClick={() => setActiveTab('members')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'members' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          <Users className="w-3.5 h-3.5 inline mr-1.5" />
+          Medlemsliste
+        </button>
+        <button
+          onClick={() => setActiveTab('balance')}
+          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'balance' ? 'bg-card shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+        >
+          <Wallet className="w-3.5 h-3.5 inline mr-1.5" />
+          Spillersaldo
+        </button>
+      </div>
+
+      {activeTab === 'balance' && <PlayerBalance />}
+
+      {activeTab === 'members' && <>
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -201,6 +226,7 @@ export default function Members() {
       </div>
 
       {/* Add/Edit Dialog */}
+      </>}
       <Dialog open={showForm} onOpenChange={(open) => { if (!open) resetForm(); }}>
         <DialogContent className="max-w-md">
           <DialogHeader>

@@ -13,6 +13,7 @@ import RecentActivity from '@/components/dashboard/RecentActivity';
 import TeamFilter from '@/components/dashboard/TeamFilter';
 import ProblemBox from '@/components/dashboard/ProblemBox';
 import ExpensePieChart from '@/components/dashboard/ExpensePieChart';
+import PlayerBalanceWidget from '@/components/dashboard/PlayerBalanceWidget';
 import { toast } from 'sonner';
 
 export default function Dashboard() {
@@ -167,6 +168,7 @@ export default function Dashboard() {
             onMarkPaid={(p) => markPaidMutation.mutate(p)}
             onSendReminder={(p) => sendReminderMutation.mutate(p)}
           />
+          <PlayerBalanceWidget members={members} payments={payments} />
           <AiInsightsWidget
             totalIncome={totalIncome}
             totalExpenses={totalExpenses}
