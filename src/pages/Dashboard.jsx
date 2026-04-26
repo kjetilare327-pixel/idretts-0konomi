@@ -15,6 +15,7 @@ import ProblemBox from '@/components/dashboard/ProblemBox';
 import ExpensePieChart from '@/components/dashboard/ExpensePieChart';
 import PlayerBalanceWidget from '@/components/dashboard/PlayerBalanceWidget';
 import SeasonBudgetWidget from '@/components/dashboard/SeasonBudgetWidget';
+import LiquidityWidget from '@/components/dashboard/LiquidityWidget';
 import { toast } from 'sonner';
 
 export default function Dashboard() {
@@ -171,6 +172,7 @@ export default function Dashboard() {
           />
           <PlayerBalanceWidget members={members} payments={payments} />
           <SeasonBudgetWidget />
+          <LiquidityWidget />
           <AiInsightsWidget
             totalIncome={totalIncome}
             totalExpenses={totalExpenses}

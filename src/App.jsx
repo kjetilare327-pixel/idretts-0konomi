@@ -101,7 +101,6 @@ const AuthenticatedApp = () => {
         <Route path="/settings" element={<Settings />} />
         <Route path="/ai-assistant" element={<AiAssistant />} />
         <Route path="/automation" element={<Automation />} />
-        <Route path="/liquidity" element={<Liquidity />} />
         <Route path="/bank-integration" element={<BankIntegration />} />
         <Route path="/recurring-payments" element={<RecurringPayments />} />
         <Route path="/families" element={<Families />} />
