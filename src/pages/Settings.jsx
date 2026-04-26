@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Save, Building2, Mail, Trash2, AlertTriangle, Hash, Sun, Moon, Monitor } from 'lucide-react';
+import { Save, Building2, Mail, Trash2, AlertTriangle, Hash, Sun, Moon, Monitor, Shield, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import SubscriptionCard from '@/components/settings/SubscriptionCard';
 import { Button } from '@/components/ui/button';
@@ -174,6 +174,73 @@ export default function Settings() {
 
       {/* Subscription */}
       <SubscriptionCard club={club} />
+
+      <Separator />
+
+      {/* Privacy & Consent */}
+      <div className="bg-card rounded-xl border border-border p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Shield className="w-5 h-5 text-muted-foreground" />
+          <h3 className="text-base font-semibold">Personvern og samtykke</h3>
+        </div>
+        {user?.consent_given ? (
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 rounded-xl">
+              <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-green-800 dark:text-green-300">Samtykke gitt</p>
+                <p className="text-xs text-green-700 dark:text-green-400 mt-0.5">
+                  Versjon {user.consent_version || '1.0'} · {user.consent_date ? new Date(user.consent_date).toLocaleDateString('nb-NO') : ''}
+                </p>
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Du har samtykket til behandling av personopplysninger i KlubbFinans. Du kan trekke samtykket ditt nedenfor –
+              merk at dette vil logge deg ut og deaktivere tilgangen til appen.
+            </p>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" size="sm" className="text-destructive border-destructive/40 hover:bg-destructive/10">
+                  Trekk samtykke tilbake
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="flex items-center gap-2">
+                    <AlertTriangle className="w-5 h-5 text-destructive" />
+                    Trekk tilbake samtykke?
+                  </AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Dette vil trekke tilbake ditt GDPR-samtykke og logge deg ut. Du vil ikke ha tilgang til KlubbFinans
+                    uten å gi samtykke på nytt ved neste innlogging.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Avbryt</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    onClick={async () => {
+                      await base44.auth.updateMe({ consent_given: false, consent_date: null, consent_version: null });
+                      toast.info('Samtykke trukket tilbake. Du logges ut.');
+                      setTimeout(() => base44.auth.logout('/'), 1500);
+                    }}
+                  >
+                    Ja, trekk samtykke
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">Ingen aktiv samtykkestatus registrert.</p>
+        )}
+        <p className="text-xs text-muted-foreground mt-4">
+          Les vår{' '}
+          <a href="https://www.klubbfinans.no/personvern" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">
+            fulle personvernerklæring
+          </a>.
+        </p>
+      </div>
 
       <Separator />
 

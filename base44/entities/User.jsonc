@@ -24,6 +24,19 @@
         "type": "string"
       },
       "description": "Member IDs linked to this parent"
+    },
+    "consent_given": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the user has given GDPR consent"
+    },
+    "consent_date": {
+      "type": "string",
+      "description": "ISO timestamp when consent was given"
+    },
+    "consent_version": {
+      "type": "string",
+      "description": "Version of the consent/privacy policy the user agreed to"
     }
   }
 }
