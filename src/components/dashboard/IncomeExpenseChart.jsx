@@ -39,7 +39,7 @@ export default function IncomeExpenseChart({ transactions }) {
   const visibleData = chartData.slice(0, currentMonth + 1);
 
   return (
-    <div className="bg-card rounded-xl border border-border p-6">
+    <div className="bg-card rounded-2xl border border-border p-6">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-base font-semibold">Inntekter vs. utgifter</h3>
         <div className="flex gap-1 bg-muted rounded-lg p-1">

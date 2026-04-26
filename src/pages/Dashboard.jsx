@@ -126,7 +126,7 @@ export default function Dashboard() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
@@ -141,7 +141,7 @@ export default function Dashboard() {
       <ProblemBox payments={payments} members={members} teamFilter={teamFilter} />
 
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
         <StatCard title="Saldo" value={formatNOK(balance)} icon={Wallet} variant={balance >= 0 ? 'success' : 'danger'} />
         <StatCard title="Inntekter i år" value={formatNOK(totalIncome)} icon={TrendingUp} variant="success"
           trend={incomeTrend !== null ? { value: incomeTrend, label: 'vs. forrige mnd' } : undefined} />
@@ -155,7 +155,7 @@ export default function Dashboard() {
       <QuickActions />
 
       {/* Main content grid */}
-      <div className="grid lg:grid-cols-5 gap-6">
+      <div className="grid lg:grid-cols-5 gap-7">
         <div className="lg:col-span-3 space-y-6">
           <IncomeExpenseChart transactions={ytdTransactions} />
           <ExpensePieChart transactions={ytdTransactions} />

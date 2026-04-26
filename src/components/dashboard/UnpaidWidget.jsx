@@ -40,7 +40,7 @@ export default function UnpaidWidget({ payments, onMarkPaid, onSendReminder }) {
 
   if (unpaid.length === 0) {
     return (
-      <div className="bg-card rounded-xl border border-border p-6">
+      <div className="bg-card rounded-2xl border border-border p-6">
         <h3 className="text-base font-semibold mb-4">Ubetalte krav</h3>
         <div className="flex flex-col items-center py-8 text-muted-foreground">
           <Check className="w-10 h-10 mb-2 text-green-500" />
@@ -51,7 +51,7 @@ export default function UnpaidWidget({ payments, onMarkPaid, onSendReminder }) {
   }
 
   return (
-    <div className="bg-card rounded-xl border border-border p-6">
+    <div className="bg-card rounded-2xl border border-border p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">

@@ -25,7 +25,7 @@ export default function ExpensePieChart({ transactions }) {
 
   if (data.length === 0) {
     return (
-      <div className="bg-card rounded-xl border border-border p-5">
+      <div className="bg-card rounded-2xl border border-border p-6">
         <h3 className="font-semibold text-sm mb-4">Utgifter per kategori</h3>
         <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">
           Ingen utgifter registrert ennå
@@ -47,7 +47,7 @@ export default function ExpensePieChart({ transactions }) {
   };
 
   return (
-    <div className="bg-card rounded-xl border border-border p-5">
+    <div className="bg-card rounded-2xl border border-border p-6">
       <h3 className="font-semibold text-sm mb-1">Utgifter per kategori</h3>
       <p className="text-xs text-muted-foreground mb-4">Totalt {formatNOK(totalExpenses)}</p>
       <ResponsiveContainer width="100%" height={220}>
