@@ -48,6 +48,19 @@
         "inactive"
       ],
       "default": "active"
+    },
+    "club_role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "okonomi",
+        "coach",
+        "parent",
+        "player",
+        "readonly"
+      ],
+      "default": "player",
+      "description": "App-level role for access control"
     }
   },
   "required": [

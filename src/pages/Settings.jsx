@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Save, Building2, Mail, Trash2, AlertTriangle, Hash, Sun, Moon, Monitor, Shield, CheckCircle2 } from 'lucide-react';
+import { Save, Building2, Mail, Trash2, AlertTriangle, Hash, Sun, Moon, Monitor, Shield, CheckCircle2, Users } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import SubscriptionCard from '@/components/settings/SubscriptionCard';
+import RolesOverview from '@/components/settings/RolesOverview';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -168,6 +169,20 @@ export default function Settings() {
           <Button type="submit">Inviter</Button>
         </form>
         <p className="text-xs text-muted-foreground mt-2">Brukeren får en invitasjon på e-post og kan logge inn umiddelbart.</p>
+      </div>
+
+      <Separator />
+
+      {/* Roles Overview */}
+      <div className="bg-card rounded-xl border border-border p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Users className="w-5 h-5 text-muted-foreground" />
+          <div>
+            <h3 className="text-base font-semibold">Tilgangskontroll</h3>
+            <p className="text-xs text-muted-foreground mt-0.5">Oversikt over roller og tilganger i klubben. Endre rolle via ⋯-menyen i Medlemmer.</p>
+          </div>
+        </div>
+        <RolesOverview />
       </div>
 
       <Separator />

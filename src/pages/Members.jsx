@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Plus, Users, Search, Edit2, Trash2, Wallet } from 'lucide-react';
+import { Plus, Users, Search, Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import MemberBalanceBadge from '@/components/members/MemberBalanceBadge';
+import MemberRoleMenu, { CLUB_ROLES } from '@/components/members/MemberRoleMenu';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import PlayerBalance from '@/pages/PlayerBalance';
@@ -107,6 +108,7 @@ export default function Members() {
     });
 
   const typeLabels = { player: 'Spiller', coach: 'Trener', volunteer: 'Frivillig', board_member: 'Styremedlem' };
+  const roleLabel = (m) => CLUB_ROLES.find(r => r.value === (m.club_role || 'player'))?.label;
 
   return (
     <div className="space-y-6">
@@ -211,13 +213,17 @@ export default function Members() {
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => handleEdit(m)}>
-                    <Edit2 className="w-3.5 h-3.5" />
-                  </Button>
-                  <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => { if (confirm('Slette dette medlemmet?')) deleteMutation.mutate(m.id); }}>
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
+                <div className="flex items-center gap-2">
+                  {m.club_role && m.club_role !== 'player' && (
+                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 hidden sm:inline-flex">
+                      {roleLabel(m)}
+                    </Badge>
+                  )}
+                  <MemberRoleMenu
+                    member={m}
+                    onEdit={handleEdit}
+                    onDelete={(id) => deleteMutation.mutate(id)}
+                  />
                 </div>
               </div>
             ))}
