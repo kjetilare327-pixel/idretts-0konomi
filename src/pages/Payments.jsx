@@ -12,6 +12,8 @@ import PaymentForm from '@/components/payments/PaymentForm';
 import RecordPaymentDialog from '@/components/payments/RecordPaymentDialog';
 import AiCostSplitter from '@/components/payments/AiCostSplitter';
 import VippsPayButton from '@/components/payments/VippsPayButton';
+import PaymentLinkButtons from '@/components/payments/PaymentLinkButtons';
+import PaymentLinkStatusBadge from '@/components/payments/PaymentLinkStatusBadge';
 import { toast } from 'sonner';
 
 export default function Payments() {
@@ -168,6 +170,7 @@ export default function Payments() {
                       <h4 className="text-sm font-semibold">{p.title}</h4>
                       <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${status.colorClass}`}>{status.label}</Badge>
                       {p.category && <Badge variant="secondary" className="text-[10px] px-1.5 py-0">{PAYMENT_CATEGORIES[p.category]}</Badge>}
+                      <PaymentLinkStatusBadge linkStatus={p.link_status} />
                     </div>
                     <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
                       <span>Forfaller {formatDate(p.due_date)}</span>
@@ -181,17 +184,20 @@ export default function Payments() {
                       </span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="flex flex-col items-end gap-2 flex-shrink-0">
                     <span className="text-base font-bold whitespace-nowrap">{formatNOK(remaining)}</span>
                     {p.status !== 'paid' && (
                       <>
-                        <Button size="sm" variant="outline" onClick={() => sendReminderMutation.mutate(p)} title="Send påminnelse">
-                          <Send className="w-3.5 h-3.5" />
-                        </Button>
-                        <VippsPayButton payment={p} size="sm" />
-                        <Button size="sm" onClick={() => setRecordPayment(p)} title="Registrer betaling">
-                          <Check className="w-3.5 h-3.5 mr-1" /> Manuell
-                        </Button>
+                        <PaymentLinkButtons payment={p} />
+                        <div className="flex items-center gap-1.5">
+                          <Button size="sm" variant="outline" onClick={() => sendReminderMutation.mutate(p)} title="Send påminnelse">
+                            <Send className="w-3.5 h-3.5" />
+                          </Button>
+                          <VippsPayButton payment={p} size="sm" />
+                          <Button size="sm" onClick={() => setRecordPayment(p)} title="Registrer betaling">
+                            <Check className="w-3.5 h-3.5 mr-1" /> Manuell
+                          </Button>
+                        </div>
                       </>
                     )}
                   </div>

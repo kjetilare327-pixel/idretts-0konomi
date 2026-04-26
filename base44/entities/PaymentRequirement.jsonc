@@ -65,6 +65,20 @@
     "last_reminder_date": {
       "type": "string",
       "format": "date"
+    },
+    "link_status": {
+      "type": "string",
+      "enum": [
+        "vipps_link_sent",
+        "stripe_link_sent",
+        "paid_via_vipps",
+        "paid_via_stripe"
+      ],
+      "description": "Status of the payment link"
+    },
+    "stripe_payment_link": {
+      "type": "string",
+      "description": "Stripe payment link URL"
     }
   },
   "required": [
