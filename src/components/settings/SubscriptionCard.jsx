@@ -15,7 +15,7 @@ export default function SubscriptionCard({ club }) {
 
   const activeMembers = members.filter(m => m.status === 'active');
   const memberCount = activeMembers.length;
-  const monthlyTotal = memberCount * 20;
+  const monthlyTotal = memberCount * 19;
 
   // Check URL params for subscription result
   const params = new URLSearchParams(window.location.search);
@@ -79,7 +79,7 @@ export default function SubscriptionCard({ club }) {
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Pris per medlem</span>
-          <span className="font-semibold">20 kr / mnd</span>
+          <span className="font-semibold">19 kr / mnd</span>
         </div>
         <div className="flex items-center justify-between text-sm border-t border-border pt-2 mt-2">
           <span className="font-semibold">Total per måned</span>
