@@ -15,6 +15,7 @@ import ProblemBox from '@/components/dashboard/ProblemBox';
 import ExpensePieChart from '@/components/dashboard/ExpensePieChart';
 import PlayerBalanceWidget from '@/components/dashboard/PlayerBalanceWidget';
 import SeasonBudgetWidget from '@/components/dashboard/SeasonBudgetWidget';
+import IncomeExpenseSplit from '@/components/dashboard/IncomeExpenseSplit';
 import LiquidityWidget from '@/components/dashboard/LiquidityWidget';
 import { toast } from 'sonner';
 
@@ -161,6 +162,7 @@ export default function Dashboard() {
       <div className="grid lg:grid-cols-5 gap-7">
         <div className="lg:col-span-3 space-y-6">
           <IncomeExpenseChart transactions={ytdTransactions} />
+          <IncomeExpenseSplit transactions={ytdTransactions} />
           <ExpensePieChart transactions={ytdTransactions} />
           <RecentActivity transactions={filteredTransactions.slice(0, 5)} />
         </div>
