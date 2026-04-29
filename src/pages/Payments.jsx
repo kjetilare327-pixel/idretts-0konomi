@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Plus, Send, Check, Search, CreditCard } from 'lucide-react';
+import { Plus, Send, Check, Search, CreditCard, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +14,7 @@ import AiCostSplitter from '@/components/payments/AiCostSplitter';
 import VippsPayButton from '@/components/payments/VippsPayButton';
 import PaymentLinkButtons from '@/components/payments/PaymentLinkButtons';
 import PaymentLinkStatusBadge from '@/components/payments/PaymentLinkStatusBadge';
+import GenerateMembershipDialog from '@/components/payments/GenerateMembershipDialog';
 import { toast } from 'sonner';
 
 export default function Payments() {
@@ -23,6 +24,7 @@ export default function Payments() {
   const [statusFilter, setStatusFilter] = useState(params.get('filter') === 'overdue' ? 'overdue' : params.get('filter') === 'unpaid' ? 'unpaid' : 'all');
   const [search, setSearch] = useState('');
   const [recordPayment, setRecordPayment] = useState(null);
+  const [showGenerate, setShowGenerate] = useState(false);
 
   const { data: payments = [], isLoading } = useQuery({
     queryKey: ['payments'],
@@ -98,9 +100,14 @@ export default function Payments() {
           <h1 className="text-2xl font-bold">Betalinger</h1>
           <p className="text-sm text-muted-foreground mt-1">Administrer betalingskrav og innbetalinger</p>
         </div>
-        <Button onClick={() => setShowForm(true)}>
-          <Plus className="w-4 h-4 mr-2" /> Nytt betalingskrav
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setShowGenerate(true)}>
+            <Sparkles className="w-4 h-4 mr-2" /> Generer kontingent
+          </Button>
+          <Button onClick={() => setShowForm(true)}>
+            <Plus className="w-4 h-4 mr-2" /> Nytt betalingskrav
+          </Button>
+        </div>
       </div>
 
       {showForm && (
@@ -207,6 +214,8 @@ export default function Payments() {
           })
         )}
       </div>
+
+      <GenerateMembershipDialog open={showGenerate} onClose={() => setShowGenerate(false)} />
 
       <RecordPaymentDialog
         payment={recordPayment}
