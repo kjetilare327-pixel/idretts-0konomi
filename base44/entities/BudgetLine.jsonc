@@ -37,6 +37,17 @@
     },
     "description": {
       "type": "string"
+    },
+    "team_filter": {
+      "type": "string"
+    },
+    "expected_member_count": {
+      "type": "number",
+      "description": "Antall forventede betalende medlemmer (brukes for kontingentberegning)"
+    },
+    "rate_per_member": {
+      "type": "number",
+      "description": "Sats per medlem per sesong (brukes for kontingentberegning)"
     }
   },
   "required": [

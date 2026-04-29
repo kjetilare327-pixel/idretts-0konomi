@@ -17,6 +17,7 @@ import { formatNOK, CATEGORIES } from '@/lib/utils';
 import { toast } from 'sonner';
 import BudgetAlerts from '@/components/seasonbudget/BudgetAlerts';
 import BudgetExportButtons from '@/components/seasonbudget/BudgetExportButtons';
+import MembershipRevenueWidget from '@/components/seasonbudget/MembershipRevenueWidget';
 
 const THRESHOLD_WARN = 85;
 const THRESHOLD_OVER = 100;
@@ -33,7 +34,7 @@ export default function SeasonBudget() {
   const [expandedCategory, setExpandedCategory] = useState(null);
 
   const [newBudget, setNewBudget] = useState({ name: '', season_id: '', team_filter: '' });
-  const [lineForm, setLineForm] = useState({ category: '', type: 'expense', budgeted_amount: '', description: '', team_filter: '' });
+  const [lineForm, setLineForm] = useState({ category: '', type: 'expense', budgeted_amount: '', description: '', team_filter: '', expected_member_count: '', rate_per_member: '' });
 
   const { data: clubs = [] } = useQuery({
     queryKey: ['clubs', user?.email],
@@ -124,6 +125,16 @@ export default function SeasonBudget() {
     [grouped, seasonTransactions]
   );
 
+  // Membership fee budget line (for revenue widget)
+  const membershipBudgetLine = useMemo(() =>
+    seasonBudgetLines.find(b => b.type === 'income' && b.category === 'membership_fees' && (b.expected_member_count || b.rate_per_member)),
+    [seasonBudgetLines]
+  );
+  const membershipActualIncome = useMemo(() =>
+    seasonTransactions.filter(t => t.type === 'income' && t.category === 'membership_fees').reduce((s, t) => s + (t.amount || 0), 0),
+    [seasonTransactions]
+  );
+
   const totalBudgetedIncome = seasonBudgetLines.filter(b => b.type === 'income').reduce((s, b) => s + (b.budgeted_amount || 0), 0);
   const totalBudgetedExpense = seasonBudgetLines.filter(b => b.type === 'expense').reduce((s, b) => s + (b.budgeted_amount || 0), 0);
   const totalActualIncome = seasonTransactions.filter(t => t.type === 'income').reduce((s, t) => s + (t.amount || 0), 0);
@@ -133,13 +144,15 @@ export default function SeasonBudget() {
     mutationFn: (data) => base44.entities.BudgetLine.create({
       ...data,
       budgeted_amount: parseFloat(data.budgeted_amount),
+      expected_member_count: data.expected_member_count ? parseInt(data.expected_member_count) : undefined,
+      rate_per_member: data.rate_per_member ? parseFloat(data.rate_per_member) : undefined,
       club_id: club?.id,
       season_id: currentSeasonId,
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['budgetLines'] });
       setShowLineForm(false);
-      setLineForm({ category: '', type: 'expense', budgeted_amount: '', description: '', team_filter: '' });
+      setLineForm({ category: '', type: 'expense', budgeted_amount: '', description: '', team_filter: '', expected_member_count: '', rate_per_member: '' });
       toast.success('Budsjettlinje lagt til');
     },
   });
@@ -238,6 +251,15 @@ export default function SeasonBudget() {
       {/* Alerts */}
       {alerts.length > 0 && <BudgetAlerts alerts={alerts} />}
 
+      {/* Membership revenue tracker */}
+      {activeSeason && membershipBudgetLine && (
+        <MembershipRevenueWidget
+          budgetLine={membershipBudgetLine}
+          actualIncome={membershipActualIncome}
+          season={activeSeason}
+        />
+      )}
+
       {/* Summary cards */}
       {activeSeason && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
@@ -331,6 +353,46 @@ export default function SeasonBudget() {
                 </SelectContent>
               </Select>
             </div>
+            {/* Membership fee helper fields */}
+            {lineForm.type === 'income' && lineForm.category === 'membership_fees' && (
+              <div className="rounded-xl border border-border bg-muted/30 p-3 space-y-3">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Kontingentberegning</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Antall medlemmer</Label>
+                    <Input
+                      type="number" min="0" placeholder="f.eks. 50"
+                      value={lineForm.expected_member_count}
+                      onChange={(e) => {
+                        const count = e.target.value;
+                        const rate = lineForm.rate_per_member;
+                        const auto = count && rate ? String(Math.round(parseFloat(count) * parseFloat(rate))) : lineForm.budgeted_amount;
+                        setLineForm({ ...lineForm, expected_member_count: count, budgeted_amount: auto });
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <Label>Sats per medlem (NOK)</Label>
+                    <Input
+                      type="number" min="0" placeholder="f.eks. 1500"
+                      value={lineForm.rate_per_member}
+                      onChange={(e) => {
+                        const rate = e.target.value;
+                        const count = lineForm.expected_member_count;
+                        const auto = count && rate ? String(Math.round(parseFloat(count) * parseFloat(rate))) : lineForm.budgeted_amount;
+                        setLineForm({ ...lineForm, rate_per_member: rate, budgeted_amount: auto });
+                      }}
+                    />
+                  </div>
+                </div>
+                {lineForm.expected_member_count && lineForm.rate_per_member && (
+                  <p className="text-xs text-accent font-medium">
+                    = {formatNOK(parseFloat(lineForm.expected_member_count) * parseFloat(lineForm.rate_per_member))} automatisk beregnet
+                  </p>
+                )}
+              </div>
+            )}
+
             <div>
               <Label>Budsjettert beløp (NOK)</Label>
               <Input type="number" min="0" step="1" value={lineForm.budgeted_amount}
