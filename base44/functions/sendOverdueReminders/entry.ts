@@ -39,6 +39,12 @@ Deno.serve(async (req) => {
         const dueDate = new Date(payment.due_date);
         const daysPast = Math.floor((today - dueDate) / (1000 * 60 * 60 * 24));
 
+        // Mark as overdue if past due date and not already overdue
+        if (daysPast > 0 && payment.status !== 'overdue') {
+          await base44.asServiceRole.entities.PaymentRequirement.update(payment.id, { status: 'overdue' });
+          console.log(`Marked payment ${payment.id} as overdue (${daysPast} days past due)`);
+        }
+
         if (daysPast < firstDays) continue;
 
         // Check if enough time has passed since last reminder
