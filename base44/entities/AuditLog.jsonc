@@ -36,5 +36,39 @@
     "club_id",
     "action",
     "user_email"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "data.club_id": "{{user.data.club_id}}",
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "treasurer"
+          }
+        }
+      ]
+    },
+    "read": {
+      "data.club_id": "{{user.data.club_id}}",
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "treasurer"
+          }
+        }
+      ]
+    },
+    "update": {},
+    "delete": {}
+  }
 }
