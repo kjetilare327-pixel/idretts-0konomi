@@ -38,5 +38,74 @@
     "dugnad_id",
     "member_id",
     "club_id"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "data.club_id": "{{user.data.club_id}}",
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "treasurer"
+          }
+        }
+      ]
+    },
+    "read": {
+      "data.club_id": "{{user.data.club_id}}",
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "treasurer"
+          }
+        },
+        {
+          "data.member_id": {
+            "$in": [
+              "{{user.data.linked_member_ids}}"
+            ]
+          }
+        }
+      ]
+    },
+    "update": {
+      "data.club_id": "{{user.data.club_id}}",
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "treasurer"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "data.club_id": "{{user.data.club_id}}",
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "treasurer"
+          }
+        }
+      ]
+    }
+  }
 }
