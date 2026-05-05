@@ -70,6 +70,17 @@ export default function DugnadDetail({ dugnad, members, club, onBack }) {
 
   const updateStatusMutation = useMutation({
     mutationFn: ({ id, status }) => base44.entities.DugnadParticipant.update(id, { status }),
+    onMutate: async ({ id, status }) => {
+      await queryClient.cancelQueries({ queryKey: ['dugnad-participants', dugnad.id] });
+      const previous = queryClient.getQueryData(['dugnad-participants', dugnad.id]);
+      queryClient.setQueryData(['dugnad-participants', dugnad.id], (old = []) =>
+        old.map(p => p.id === id ? { ...p, status } : p)
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData(['dugnad-participants', dugnad.id], context.previous);
+    },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['dugnad-participants', dugnad.id] }),
   });
 

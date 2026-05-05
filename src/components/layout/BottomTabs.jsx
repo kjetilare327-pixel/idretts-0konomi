@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, CreditCard, Users, Bot, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -13,6 +13,15 @@ const tabs = [
 
 export default function BottomTabs() {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleTabPress = (tab) => {
+    if (location.pathname === tab.path) {
+      // Already on this tab — reset to root by replacing current history entry
+      navigate(tab.path, { replace: true });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   return (
     <nav
@@ -25,8 +34,9 @@ export default function BottomTabs() {
           <Link
             key={tab.path}
             to={tab.path}
+            onClick={() => handleTabPress(tab)}
             className={cn(
-              'flex-1 flex flex-col items-center justify-center py-2 gap-0.5 text-[10px] font-medium transition-colors',
+              'flex-1 flex flex-col items-center justify-center py-2 gap-0.5 text-[10px] font-medium transition-colors min-h-[44px]',
               isActive ? 'text-primary' : 'text-muted-foreground'
             )}
           >

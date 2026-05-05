@@ -38,9 +38,22 @@ export default function Payments() {
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.PaymentRequirement.create(data),
+    onMutate: async (newPayment) => {
+      await queryClient.cancelQueries({ queryKey: ['payments'] });
+      const previous = queryClient.getQueryData(['payments']);
+      queryClient.setQueryData(['payments'], (old = []) => [
+        { ...newPayment, id: `optimistic-${Date.now()}`, amount_paid: 0, status: 'pending', reminder_count: 0 },
+        ...old,
+      ]);
+      setShowForm(false);
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData(['payments'], context.previous);
+      toast.error('Kunne ikke opprette betalingskrav');
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payments'] });
-      setShowForm(false);
       toast.success('Betalingskrav opprettet');
     },
   });
@@ -197,11 +210,11 @@ export default function Payments() {
                       <>
                         <PaymentLinkButtons payment={p} />
                         <div className="flex items-center gap-1.5">
-                          <Button size="sm" variant="outline" onClick={() => sendReminderMutation.mutate(p)} title="Send påminnelse">
+                          <Button size="sm" variant="outline" onClick={() => sendReminderMutation.mutate(p)} title="Send påminnelse" className="tap-target">
                             <Send className="w-3.5 h-3.5" />
                           </Button>
                           <VippsPayButton payment={p} size="sm" />
-                          <Button size="sm" onClick={() => setRecordPayment(p)} title="Registrer betaling">
+                          <Button size="sm" onClick={() => setRecordPayment(p)} title="Registrer betaling" className="tap-target">
                             <Check className="w-3.5 h-3.5 mr-1" /> Manuell
                           </Button>
                         </div>

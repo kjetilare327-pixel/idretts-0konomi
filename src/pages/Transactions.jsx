@@ -26,9 +26,22 @@ export default function Transactions() {
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Transaction.create(data),
+    onMutate: async (newTransaction) => {
+      await queryClient.cancelQueries({ queryKey: ['transactions'] });
+      const previous = queryClient.getQueryData(['transactions']);
+      queryClient.setQueryData(['transactions'], (old = []) => [
+        { ...newTransaction, id: `optimistic-${Date.now()}` },
+        ...old,
+      ]);
+      setShowForm(false);
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData(['transactions'], context.previous);
+      toast.error('Kunne ikke registrere transaksjon');
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['transactions'] });
-      setShowForm(false);
       toast.success('Transaksjon registrert');
     },
   });

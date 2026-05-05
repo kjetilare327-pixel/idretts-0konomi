@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/toaster"
+import { AnimatePresence, motion } from 'framer-motion';
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
@@ -8,6 +9,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { ThemeProvider } from '@/lib/ThemeContext';
 
 import AppLayout from '@/components/layout/AppLayout';
+import PageTransition from '@/components/layout/PageTransition';
 import Dashboard from '@/pages/Dashboard';
 import Transactions from '@/pages/Transactions';
 import Payments from '@/pages/Payments';
@@ -90,24 +92,24 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route path="/onboarding" element={<Onboarding />} />
       <Route element={<AppLayout />}>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/transactions" element={<Transactions />} />
-        <Route path="/payments" element={<Payments />} />
-        <Route path="/expenses" element={<Expenses />} />
-        <Route path="/members" element={<Members />} />
-        <Route path="/seasons" element={<Seasons />} />
-        <Route path="/budget" element={<Budget />} />
-        <Route path="/reports" element={<Reports />} />
-        <Route path="/audit-log" element={<AuditLog />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/ai-assistant" element={<AiAssistant />} />
-        <Route path="/automation" element={<Automation />} />
-        <Route path="/bank-integration" element={<BankIntegration />} />
-        <Route path="/recurring-payments" element={<RecurringPayments />} />
-        <Route path="/families" element={<Families />} />
-        <Route path="/dugnad" element={<Dugnad />} />
-        <Route path="/player-balance" element={<PlayerBalance />} />
-        <Route path="/season-budget" element={<SeasonBudget />} />
+      <Route path="/" element={<PageTransition><Dashboard /></PageTransition>} />
+      <Route path="/transactions" element={<PageTransition><Transactions /></PageTransition>} />
+      <Route path="/payments" element={<PageTransition><Payments /></PageTransition>} />
+      <Route path="/expenses" element={<PageTransition><Expenses /></PageTransition>} />
+      <Route path="/members" element={<PageTransition><Members /></PageTransition>} />
+      <Route path="/seasons" element={<PageTransition><Seasons /></PageTransition>} />
+      <Route path="/budget" element={<PageTransition><Budget /></PageTransition>} />
+      <Route path="/reports" element={<PageTransition><Reports /></PageTransition>} />
+      <Route path="/audit-log" element={<PageTransition><AuditLog /></PageTransition>} />
+      <Route path="/settings" element={<PageTransition><Settings /></PageTransition>} />
+      <Route path="/ai-assistant" element={<PageTransition><AiAssistant /></PageTransition>} />
+      <Route path="/automation" element={<PageTransition><Automation /></PageTransition>} />
+      <Route path="/bank-integration" element={<PageTransition><BankIntegration /></PageTransition>} />
+      <Route path="/recurring-payments" element={<PageTransition><RecurringPayments /></PageTransition>} />
+      <Route path="/families" element={<PageTransition><Families /></PageTransition>} />
+      <Route path="/dugnad" element={<PageTransition><Dugnad /></PageTransition>} />
+      <Route path="/player-balance" element={<PageTransition><PlayerBalance /></PageTransition>} />
+      <Route path="/season-budget" element={<PageTransition><SeasonBudget /></PageTransition>} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

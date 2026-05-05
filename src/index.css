@@ -116,3 +116,13 @@
   .mb-safe     { margin-bottom:  max(env(safe-area-inset-bottom), 0.5rem); }
   .h-safe-bottom { height: env(safe-area-inset-bottom); }
 }
+
+/* Mobile tap targets: ensure action buttons are at least 44px tall on touch devices */
+@media (pointer: coarse) {
+  .tap-target {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
