@@ -66,5 +66,67 @@
     "amount",
     "club_id",
     "date"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "data.club_id": "{{user.data.club_id}}",
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "treasurer"
+          }
+        }
+      ]
+    },
+    "read": {
+      "data.club_id": "{{user.data.club_id}}",
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "treasurer"
+          }
+        }
+      ]
+    },
+    "update": {
+      "data.club_id": "{{user.data.club_id}}",
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "treasurer"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "data.club_id": "{{user.data.club_id}}",
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "treasurer"
+          }
+        }
+      ]
+    }
+  }
 }
