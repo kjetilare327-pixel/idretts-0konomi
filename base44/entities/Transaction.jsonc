@@ -95,6 +95,18 @@
           "user_condition": {
             "role": "treasurer"
           }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        },
+        {
+          "data.member_id": {
+            "$in": [
+              "{{user.data.linked_member_ids}}"
+            ]
+          }
         }
       ]
     },
