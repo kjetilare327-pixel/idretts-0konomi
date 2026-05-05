@@ -54,18 +54,29 @@
     "name"
   ],
   "rls": {
-    "create": {},
+    "create": {
+      "created_by": "{{user.email}}"
+    },
     "read": {
-      "_id": "{{user.data.club_id}}"
+      "id": "{{user.data.club_id}}"
     },
     "update": {
-      "_id": "{{user.data.club_id}}",
-      "user_condition": {
-        "role": "admin"
-      }
+      "id": "{{user.data.club_id}}",
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "treasurer"
+          }
+        }
+      ]
     },
     "delete": {
-      "_id": "{{user.data.club_id}}",
+      "id": "{{user.data.club_id}}",
       "user_condition": {
         "role": "admin"
       }
