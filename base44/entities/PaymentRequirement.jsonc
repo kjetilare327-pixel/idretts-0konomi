@@ -104,30 +104,32 @@
       ]
     },
     "read": {
+      "data.club_id": "{{user.data.club_id}}",
       "$or": [
         {
-          "data.club_id": "{{user.data.club_id}}",
-          "$or": [
-            {
-              "user_condition": {
-                "role": "admin"
-              }
-            },
-            {
-              "user_condition": {
-                "role": "treasurer"
-              }
-            }
-          ]
+          "user_condition": {
+            "role": "admin"
+          }
         },
         {
-          "data.club_id": "{{user.data.club_id}}",
+          "user_condition": {
+            "role": "treasurer"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "parent"
+          },
           "data.parent_email": "{{user.email}}"
         },
         {
-          "data.club_id": "{{user.data.club_id}}",
+          "user_condition": {
+            "role": "parent"
+          },
           "data.member_ids": {
-            "$in": "{{user.data.linked_member_ids}}"
+            "$in": [
+              "{{user.data.linked_member_ids}}"
+            ]
           }
         }
       ]
